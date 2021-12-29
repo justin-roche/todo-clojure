@@ -32,7 +32,7 @@
    :enter
    (fn [ctx]
      (let [token (get-in ctx [:request :headers "authorization"])
-           user-data (log-through (unsign-token token))]
+           user-data (unsign-token token)]
        (utils/update-req ctx {:user user-data})))})
 
 (defn login [rq]

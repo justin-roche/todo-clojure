@@ -34,12 +34,9 @@
 (defstate conn :start (db-connect config-map)
   :stop (db-disconnect conn))
 
-(defn create-users-collection []
-  (try (mc/create (:db conn) "users" {})
-       (catch Exception e (clojure.pprint/pprint (str "caught exception: " (.toString e))))))
-
 (defn reset-db []
   (mc/purge-many (:db conn) ["users"])
+  (mc/purge-many (:db conn) ["todos"])
   {:status 200})
 
 (defn create-collection [db name]

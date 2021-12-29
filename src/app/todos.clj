@@ -2,18 +2,23 @@
   (:require
    [app.db :refer [find-by-id find-document get-collection insert-multiple
                    update-by-id insert]]
-   [app.utils :refer [log-through xlog-through]]
    [cheshire.core :refer :all]
-   [monger.result :refer :all]))
+   [monger.result :refer :all]
+   [app.utils :as utils]))
 
-(defn add-todo-for-user [req]
-  (if (insert "todos" {}) {:status 200} {:status 409}))
+(defn create-todo [todo user]
+  (if (insert "todos" (merge todo {:username (:username user)}))
+    {:status 200}
+    {:status 409}))
 
-(defn get-todos-for-user [req]
-  ;; (if-let [users (get-collection "todos")]
-  ;;   {:status 200 :body {:data users}}
-  ;;   {:status 409})
+(defn delete-todo [todo-id]
+  ;; (if (insert "todos" (merge todo {:user user})) {:status 200} {:status 409})
   )
+
+(defn get-todos [req user]
+  (if-let [todos (get-collection "todos")]
+    {:status 200 :body {:data todos}}
+    {:status 409}))
 ;; (defn update-user [body id]
 ;;   (if-let [user (update-by-id "users" id body)]
 ;;     (if-let [r (xlog-through (str "found with id " id) (find-by-id "users" id))]
@@ -21,6 +26,6 @@
 ;;         {:status 200 :body {:data r}}))
 ;;     {:status 409}))
 
-(comment (app.utils/with-mount (fn [])))
+;; (comment (app.utils/with-mount (fn [])))
 
 

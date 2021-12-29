@@ -7,5 +7,6 @@
   (stop)
   (t/run-tests 'app.test-utils)
   (t/run-tests 'app.user-tests)
-  (t/run-tests 'app.auth-tests))
+  (t/run-tests 'app.auth-tests)
+  (t/run-tests 'app.todo-tests))
 

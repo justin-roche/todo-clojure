@@ -15,7 +15,8 @@
    [reitit.coercion.malli]
    [reitit.http.interceptors.muuntaja :as muuntaja]
    [io.pedestal.http.body-params :as bp]
-   [aprint.core :refer [aprint]]))
+   [aprint.core :refer [aprint]]
+   [app.todos :as todos]))
 
 (def body-parser (bp/body-params (bp/default-parser-map)))
 
@@ -50,17 +51,16 @@
              ["/users"
               {:get {:handler (fn [rq]
                                 (users/get-users))}}]
-             ;; ["/user-search"
-             ;;  {:get {:handler (fn [rq]
-             ;;                    (users/search-user (:params rq)))
-             ;;         :parameters {:query [:map
-             ;;                              [:name string?]]}}}]
 
-             ;; ["/todo/{id}"
-             ;;  {:post {:handler (fn [rq]
-             ;;                     (todos/update-todo (:body-params rq) (:id (:path-params rq))))}
-
-             ;;   :get {:handler (fn [rq]
-             ;;                    (users/get-user (:id (:path-params rq))))}}]
-             ])
+             ["/todos"
+              {:get {:handler (fn [rq]
+                                (todos/get-todos (:body-params rq) (:user rq)))
+                     :interceptors [(auth/verify-token)]}}]
+             ["/todo/"
+              {:post {:handler (fn [rq]
+                                 (todos/create-todo (:body-params rq) (:user rq)))
+                      :interceptors [(auth/verify-token)]}}]
+             ["/todo/{id}"
+              {:delete {:handler (fn [rq]
+                                   (todos/delete-todo (:id (:path-params rq))))}}]])
 
