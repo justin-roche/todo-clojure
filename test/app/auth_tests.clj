@@ -49,13 +49,10 @@
 
 (t/deftest auth
   (t/is (= 200 (:status (valid-token-req))))
-  (t/is (= 200 (:status (login-req))))
-  (t/is (= 200 (:status (login-normal-user-req))))
-  (t/is (= 200 (:status (valid-token-req)))))
+  (t/is (= 200 (:status (login-req)))))
 
 (t/deftest auth-errors
   (t/is (= 401 (:status (invalid-token-req))))
-  (t/is (= 401 (:status (invalid-login-req))))
-  (t/is (= 401 (:status (denial-by-role-req)))))
+  (t/is (= 401 (:status (invalid-login-req)))))
 
 (use-fixtures :each system-fixture)

@@ -10,7 +10,6 @@
    [taoensso.truss :as truss :refer [have]]))
 
 (defn start-server [service-map]
-  ;; (print "starting server")
   (have keyword? (::http/type service-map))
   (-> service-map
       (ps/default-interceptors)
@@ -24,6 +23,3 @@
 (defstate s :start (start-server
                     (:server config-map))
   :stop (do  (http/stop s)))
-
-;; (start)
-;; (stop)

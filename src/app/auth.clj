@@ -47,20 +47,11 @@
        {:message "Authorization success"}}
       {:status 401})))
 
-(defn get-user-roles [ctx]
-  (get-in ctx [:request :user :roles]))
 
-(defn has-roles? [user-roles roles]
-  (subset? (set roles) (set user-roles)))
 
-(defn role [roles]
-  {:name ::verify-role
-   :enter
-   (fn [ctx]
-     (let [user-roles (get-user-roles ctx)]
-       (if (has-roles? user-roles roles)
-         ctx
-         (throw (new Exception)))))})
+
+
+
 
 
 

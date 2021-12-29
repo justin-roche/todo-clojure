@@ -2,7 +2,6 @@
   (:require
    [io.pedestal.http.route :as route]
    [app.utils :refer [with-mount log-through]]
-   [app.hero :as hero]
    [app.auth :as auth]
    [app.db :as db]
    [app.errors :as errors]
@@ -48,11 +47,6 @@
                {:handler (fn [rq]
                            {:status 200})
                 :interceptors [(auth/verify-token)]}}]
-             ["/admin"
-              {:get
-               {:handler (fn [rq]
-                           {:status 200})
-                :interceptors [(auth/verify-token) (auth/role ["admin"])]}}]
              ["/users"
               {:get {:handler (fn [rq]
                                 (users/get-users))}}]
@@ -67,10 +61,5 @@
                                  (users/update-user (:body-params rq) (:id (:path-params rq))))}
 
                :get {:handler (fn [rq]
-                                (users/get-user (:id (:path-params rq))))}}]
-             ["/hero"
-              {:get {:handler hero/get-heroes}
-               :post {:handler hero/add-heroes
-                      :parameters {:body [:map
-                                          [:a string?]]}}}]])
+                                (users/get-user (:id (:path-params rq))))}}]])
 
