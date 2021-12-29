@@ -14,11 +14,6 @@
    [app.utils :as utils]
    [app.test-data :as test-data :refer [auth-headers invalid-auth-headers non-admin-auth-headers]]))
 
-(defn admin-req []
-  (let [o (merge (get-options) auth-headers)
-        r (client/get "http://localhost:8890/admin" o)]
-    r))
-
 (defn me-req []
   (let [o (merge (get-options) auth-headers)
         r (client/get "http://localhost:8890/me" o)]
@@ -33,6 +28,7 @@
   (let [j (json/write-str {:username "A" :password "kissa13"})
         r (client/post "http://localhost:8890/login" (post-options j))]
     r))
+
 (defn invalid-login-req []
   (let [j (json/write-str {:username "x" :password "kissa13"})
         r (client/post "http://localhost:8890/login" (post-options j))]

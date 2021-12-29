@@ -52,8 +52,8 @@
 (defn get-collection [coll]
   (map change-id-string (mc/find-maps (:db conn) coll)))
 
-(defn insert [db coll item]
-  (mc/insert-and-return db coll item))
+(defn insert [coll item]
+  (mc/insert-and-return (:db conn) coll item))
 
 (defn find-by-id [coll id]
   (mc/find-by-id (:db conn) coll  (object-id id)))
@@ -70,10 +70,10 @@
   (mc/update (:db conn) coll q {$set u}))
 
 (defn update-by-id [coll oid q]
-  (utils/xlog-through "updated by id" (mc/update-by-id (:db conn) coll (object-id oid) q)))
+  (mc/update-by-id (:db conn) coll (object-id oid) q))
 
 (defn save-by-id [coll oid q]
-  (utils/xlog-through (mc/save-and-return (:db conn) coll oid q)))
+  (mc/save-and-return (:db conn) coll oid q))
 
 (defn remove-document [db coll doc]
   (mc/remove db coll doc))

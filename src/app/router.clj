@@ -50,16 +50,17 @@
              ["/users"
               {:get {:handler (fn [rq]
                                 (users/get-users))}}]
-             ["/user-search"
-              {:get {:handler (fn [rq]
-                                (users/search-user (:params rq)))
-                     :parameters {:query [:map
-                                          [:name string?]]}}}]
+             ;; ["/user-search"
+             ;;  {:get {:handler (fn [rq]
+             ;;                    (users/search-user (:params rq)))
+             ;;         :parameters {:query [:map
+             ;;                              [:name string?]]}}}]
 
-             ["/user/{id}"
-              {:post {:handler (fn [rq]
-                                 (users/update-user (:body-params rq) (:id (:path-params rq))))}
+             ;; ["/todo/{id}"
+             ;;  {:post {:handler (fn [rq]
+             ;;                     (todos/update-todo (:body-params rq) (:id (:path-params rq))))}
 
-               :get {:handler (fn [rq]
-                                (users/get-user (:id (:path-params rq))))}}]])
+             ;;   :get {:handler (fn [rq]
+             ;;                    (users/get-user (:id (:path-params rq))))}}]
+             ])
 
