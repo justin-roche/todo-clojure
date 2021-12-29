@@ -11,13 +11,15 @@
 
 (defn create-todo-req [u]
   (let [j (json/write-str u)
+        a (test-utils/create-auth-header "A")
         url (str "http://localhost:8890/todo/")
-        r (client/post url (merge (post-options j) auth-headers))]
+        r (client/post url (merge (post-options j) a))]
     r))
 
 (defn get-todos-req []
-  (let [o (merge (get-options) auth-headers)
-        r (client/get "http://localhost:8890/todos" o)]
+  (let [o (get-options)
+        a (test-utils/create-auth-header "A")
+        r (client/get "http://localhost:8890/todos" (merge o a))]
     r))
 
 (deftest create-todo-requests

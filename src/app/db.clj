@@ -60,6 +60,11 @@
     (change-id-string r)
     nil))
 
+(defn find-documents [coll q]
+  (if-let [r (mc/find-maps (:db conn) coll q)]
+    (map change-id-string r)
+    nil))
+
 (defn insert-multiple [coll items]
   (mr/acknowledged? (mc/insert-batch (:db conn) coll items)))
 

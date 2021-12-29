@@ -15,7 +15,7 @@
    [app.test-data :as test-data :refer [auth-headers invalid-auth-headers non-admin-auth-headers]]))
 
 (defn me-req []
-  (let [o (merge (get-options) auth-headers)
+  (let [o (merge (get-options) (test-utils/create-auth-header "A"))
         r (client/get "http://localhost:8890/me" o)]
     r))
 
@@ -33,6 +33,9 @@
   (let [j (json/write-str {:username "x" :password "kissa13"})
         r (client/post "http://localhost:8890/login" (post-options j))]
     r))
+
+;; (t/deftest auth-header
+;;   (test-utils/create-auth-header "A"))
 
 (t/deftest auth
   (let [r (me-req)
