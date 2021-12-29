@@ -42,10 +42,10 @@
                 :parameters {:body [:map
                                     [:password string?]
                                     [:username string?]]}}}]
-             ["/authorized"
+             ["/me"
               {:get
                {:handler (fn [rq]
-                           {:status 200})
+                           (users/get-me rq))
                 :interceptors [(auth/verify-token)]}}]
              ["/users"
               {:get {:handler (fn [rq]

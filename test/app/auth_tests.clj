@@ -19,36 +19,32 @@
         r (client/get "http://localhost:8890/admin" o)]
     r))
 
-(defn valid-token-req []
+(defn me-req []
   (let [o (merge (get-options) auth-headers)
-        r (client/get "http://localhost:8890/authorized" o)]
+        r (client/get "http://localhost:8890/me" o)]
     r))
 
 (defn invalid-token-req []
   (let [o  (merge (get-options) invalid-auth-headers)
-        r (client/get "http://localhost:8890/authorized" o)]
-    r))
-
-(defn denial-by-role-req []
-  (let [o  (merge (get-options) non-admin-auth-headers)
-        r (client/get "http://localhost:8890/admin" o)]
+        r (client/get "http://localhost:8890/me" o)]
     r))
 
 (defn login-req []
   (let [j (json/write-str {:username "A" :password "kissa13"})
-        r (utils/xlog-through (client/post "http://localhost:8890/login" (post-options j)))]
+        r (client/post "http://localhost:8890/login" (post-options j))]
     r))
 (defn invalid-login-req []
   (let [j (json/write-str {:username "x" :password "kissa13"})
         r (client/post "http://localhost:8890/login" (post-options j))]
     r))
-(defn login-normal-user-req []
-  (let [j (json/write-str {:username "B" :password "koira12"})
-        r (client/post "http://localhost:8890/login" (post-options j))]
-    r))
 
 (t/deftest auth
-  (t/is (= 200 (:status (valid-token-req))))
+  (let [r (me-req)
+        s (:status r)
+        u (:user (:body r))]
+    (t/is (= 200 s))
+    (t/is (= "A" (:name u))))
+
   (t/is (= 200 (:status (login-req)))))
 
 (t/deftest auth-errors

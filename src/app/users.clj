@@ -25,6 +25,9 @@
       {:status 200 :body {:user user}})
     {:status 409}))
 
+(defn get-me [req]
+  (search-user {:name (:username (:user req))}))
+
 (defn update-user [body id]
   (if-let [user (update-by-id "users" id body)]
     (if-let [r (xlog-through (str "found with id " id) (find-by-id "users" id))]
@@ -32,5 +35,7 @@
         {:status 200 :body {:data r}}))
     {:status 409}))
 
-(app.utils/with-mount (fn []
-                        (search-user {:name "A"})))
+(comment (app.utils/with-mount (fn []
+                                 (log-through "users:" (get-users)))))
+
+

@@ -50,7 +50,7 @@
   (mdb/get-collection-names db))
 
 (defn get-collection [coll]
-  (mc/find-maps (:db conn) coll))
+  (map change-id-string (mc/find-maps (:db conn) coll)))
 
 (defn insert [db coll item]
   (mc/insert-and-return db coll item))

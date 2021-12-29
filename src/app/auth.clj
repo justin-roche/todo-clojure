@@ -15,11 +15,10 @@
   "kana15")
 
 (defn create-token
-  "Creates a signed jwt-token with user data as payload.
-  `valid-seconds` sets the expiration span."
+  "Creates a signed jwt-token with user data as payload. `valid-seconds` sets the expiration span. `username` is selected because the user id will change between test runs."
   [user & {:keys [valid-seconds] :or {valid-seconds 777200}}] ;; 2 hours
   (let [payload (-> user
-                    (select-keys [:id :roles])
+                    (select-keys [:username])
                     (assoc :exp (.plusSeconds
                                  (java.time.Instant/now) valid-seconds)))]
     (jwt/sign payload private-key {:alg :hs512})))
@@ -32,8 +31,8 @@
   {:name ::verify-token
    :enter
    (fn [ctx]
-     (let [token (xlog-through "token" (get-in ctx [:request :headers "authorization"]))
-           user-data (xlog-through "unsigned " (unsign-token token))]
+     (let [token (get-in ctx [:request :headers "authorization"])
+           user-data (log-through (unsign-token token))]
        (utils/update-req ctx {:user user-data})))})
 
 (defn login [rq]
@@ -42,14 +41,13 @@
         user (db/find-document "users" {:name username})]
     (if (and user (buddy-hashers/check password (:password user)))
       {:status 200
-       :token (xlog-through "new token" (create-token user))
+       :token (create-token user)
        :body
        {:message "Authorization success"}}
       {:status 401})))
 
-
-
-
+(comment (app.utils/with-mount (fn []
+                                 (log-through "user token" (create-token {:username "A"})))))
 
 
 
