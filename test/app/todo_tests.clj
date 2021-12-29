@@ -9,23 +9,35 @@
    [clojure.tools.reader]
    [app.utils :as utils]))
 
-(defn create-todo-req [u]
-  (let [j (json/write-str u)
-        a (test-utils/create-auth-header "A")
+(defn create-todo-req [data username]
+  (let [j (json/write-str data)
+        a (test-utils/create-auth-header username)
         url (str "http://localhost:8890/todo/")
         r (client/post url (merge (post-options j) a))]
     r))
 
-(defn get-todos-req []
+(defn get-todos-req [username]
   (let [o (get-options)
-        a (test-utils/create-auth-header "A")
+        a (test-utils/create-auth-header username)
         r (client/get "http://localhost:8890/todos" (merge o a))]
     r))
 
 (deftest create-todo-requests
-  (let [todos (create-todo-req {:name "swim"})]
+  (let [todos (create-todo-req {:name "swim"} "A")]
     (t/is (= 200 (:status todos))))
-  (let [todos (get-todos-req)]
+  (let [todos (get-todos-req "A")]
+    (t/is (= 200 (:status todos)))
+    (t/is (= 1 (count (:data (:body todos)))))))
+
+(deftest create-todo-requests
+  (let [b (create-todo-req {:name "swim"} "B")
+        a (create-todo-req {:name "swim"} "A")]
+    (t/is (= 200 (:status b)))
+    (t/is (= 200 (:status a))))
+  (let [todos (get-todos-req "A")]
+    (t/is (= 200 (:status todos)))
+    (t/is (= 1 (count (:data (:body todos))))))
+  (let [todos (get-todos-req "B")]
     (t/is (= 200 (:status todos)))
     (t/is (= 1 (count (:data (:body todos)))))))
 
