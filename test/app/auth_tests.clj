@@ -36,7 +36,7 @@
 
 (defn login-req []
   (let [j (json/write-str {:username "A" :password "kissa13"})
-        r (client/post "http://localhost:8890/login" (post-options j))]
+        r (utils/xlog-through (client/post "http://localhost:8890/login" (post-options j)))]
     r))
 (defn invalid-login-req []
   (let [j (json/write-str {:username "x" :password "kissa13"})
@@ -49,16 +49,13 @@
 
 (t/deftest auth
   (t/is (= 200 (:status (valid-token-req))))
-  ;; (t/is (= 200 (:status (login-req))))
-  ;; (t/is (= 200 (:status (login-normal-user-req))))
-  ;; (t/is (= 200 (:status (admin-req))))
-  ;; (t/is (= 200 (:status (valid-token-req))))
-  )
+  (t/is (= 200 (:status (login-req))))
+  (t/is (= 200 (:status (login-normal-user-req))))
+  (t/is (= 200 (:status (valid-token-req)))))
 
 (t/deftest auth-errors
-  ;; (t/is (= 401 (:status (invalid-token-req))))
-  ;; (t/is (= 401 (:status (invalid-login-req))))
-  ;; (t/is (= 401 (:status (denial-by-role-req))))
-  )
+  (t/is (= 401 (:status (invalid-token-req))))
+  (t/is (= 401 (:status (invalid-login-req))))
+  (t/is (= 401 (:status (denial-by-role-req)))))
 
 (use-fixtures :each system-fixture)

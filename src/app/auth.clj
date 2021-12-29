@@ -1,6 +1,6 @@
 (ns app.auth
   (:require
-   [app.utils :as utils :refer [log-through]]
+   [app.utils :as utils :refer [log-through xlog-through]]
    [buddy.hashers :as buddy-hashers]
    [buddy.sign.jwt :as jwt]
    [clojure.set :refer [subset?]]
@@ -26,14 +26,14 @@
 
 (defn unsign-token [token]
   (try (jwt/unsign token private-key {:alg :hs512})
-       (catch Exception e (do (pl/error "jwt error" (ex-data e)) (throw e)))))
+       (catch Exception e (throw e))))
 
 (defn verify-token []
   {:name ::verify-token
    :enter
    (fn [ctx]
-     (let [token (log-through "token" (get-in ctx [:request :headers "authorization"]))
-           user-data (log-through "unsigned " (unsign-token token))]
+     (let [token (xlog-through "token" (get-in ctx [:request :headers "authorization"]))
+           user-data (xlog-through "unsigned " (unsign-token token))]
        (utils/update-req ctx {:user user-data})))})
 
 (defn login [rq]
@@ -42,7 +42,7 @@
         user (db/find-document "users" {:name username})]
     (if (and user (buddy-hashers/check password (:password user)))
       {:status 200
-       :token (create-token user)
+       :token (xlog-through "new token" (create-token user))
        :body
        {:message "Authorization success"}}
       {:status 401})))

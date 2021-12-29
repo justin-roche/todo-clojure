@@ -10,7 +10,7 @@
                   :age 19
                   :roles    ["user"]}])
 
-(def auth-headers {:headers {"Authorization" "eyJhbGciOiJIUzUxMiJ9.eyJpZCI6MSwicm9sZXMiOlsiYWRtaW4iLCJ1c2VyIl0sImV4cCI6MTY0MDQwNjQ3MX0.K_FUbrjpPd2IJaOYnqmG8DtPe43omUueAoupCLC_c7OhCZ68jwm6DgaAlJCN1tPViFP9_-FOeZ6ofR8FxJAYMg"}})
+(def auth-headers {:headers {"Authorization" "eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjYxY2NiMDEzMzliYTZkNzhlMDAyNWRmMiIsInJvbGVzIjpbInVzZXIiXSwiZXhwIjoxNjQxNTgxNTcyfQ.yrf1aVF5P_G-i6-QVudZpBAwF5bJMPUZ0bylriDd1rHhcClYFjCFv36EEgqtJaA6GbCrlFSjNPB15QcyThAv4w"}})
 
 (def invalid-auth-headers {:headers {"Authorization" "this is an invalid header"}})
 
