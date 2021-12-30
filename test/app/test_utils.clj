@@ -16,8 +16,8 @@
 
 (def base "http://localhost:8890/")
 
-(defn create-auth-header [username]
-  (let [token (auth/create-token {:username username})]
+(defn create-auth-header [name]
+  (let [token (auth/create-token {:name name})]
     {:headers {"Authorization" token}}))
 
 (def auth-headers {:headers {"Authorization" "eyJhbGciOiJIUzUxMiJ9.eyJpZCI6MSwicm9sZXMiOlsiYWRtaW4iLCJ1c2VyIl0sImV4cCI6MTY0MDQwNjQ3MX0.K_FUbrjpPd2IJaOYnqmG8DtPe43omUueAoupCLC_c7OhCZ68jwm6DgaAlJCN1tPViFP9_-FOeZ6ofR8FxJAYMg"}})

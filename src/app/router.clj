@@ -38,10 +38,9 @@
              {:interceptors [errors/errors-handler]}
              ["/login"
               {:post
-               {:handler users/login
-                :parameters {:body [:map
-                                    [:password string?]
-                                    [:username string?]]}}}]
+               {:handler (fn [rq]
+                           (users/login
+                            (:body-params rq)))}}]
              ["/me"
               {:get
                {:handler users/get-me

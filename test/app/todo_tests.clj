@@ -9,28 +9,28 @@
    [clojure.tools.reader]
    [app.utils :as utils]))
 
-(defn create-todo-req [data username]
+(defn create-todo-req [data name]
   (let [j (json/write-str data)
-        a (test-utils/create-auth-header username)
+        a (test-utils/create-auth-header name)
         url (str "http://localhost:8890/todo/")
         r (client/post url (merge (post-options j) a))]
     r))
 
-(defn get-todos-req [username]
+(defn get-todos-req [name]
   (let [o (get-options)
-        a (test-utils/create-auth-header username)
+        a (test-utils/create-auth-header name)
         r (client/get "http://localhost:8890/todos" (merge o a))]
     r))
 
-(defn delete-todo-req [id username]
-  (let [a (test-utils/create-auth-header username)
+(defn delete-todo-req [id name]
+  (let [a (test-utils/create-auth-header name)
         url (str "http://localhost:8890/todo/" id)
         r (client/delete url (merge (get-options) a))]
     r))
 
-(defn update-todo-req [id data username]
+(defn update-todo-req [id data name]
   (let [j (json/write-str data)
-        a (test-utils/create-auth-header username)
+        a (test-utils/create-auth-header name)
         url (str "http://localhost:8890/todo/" id)
         r (client/post url (merge (post-options j) a))]
     r))
@@ -94,7 +94,7 @@
         (t/is (= "read" (:name (first (:data (:body todos))))))))))
 
 (deftest update-todo-status
-  (t/testing "deletes todos for a user"
+  (t/testing "updates todo status"
     (let [t1 (create-todo-req {:name "swim"} "A")
           t2 (create-todo-req {:name "read"} "A")]
       (t/is (= 200 (:status t1))))

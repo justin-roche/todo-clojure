@@ -48,10 +48,10 @@
              query
              {:$push  {(keyword subdocument-key)  (merge document {:id (mu/random-uuid)})}}))
 
-(defn filter-subdocuments [username]
+(defn filter-subdocuments [name]
   (:todos (first (mc/aggregate (:db conn)
                                "users"
-                               [{mo/$match {:name username}}
+                               [{mo/$match {:name name}}
                                 {mo/$unwind "$todos"}
                                 {mo/$match {"todos.visibility" {"$not" {"$eq" "deleted"}}}}
                                 {mo/$group {:_id "$name" :todos {mo/$push "$todos"}}}]
