@@ -1,12 +1,12 @@
 (ns app.todos
   (:require
-   [app.db :refer [find-documents get-collection insert]]
+   [app.db :refer [find-documents insert]]
    [app.utils :as utils]
    [cheshire.core :refer :all]
    [monger.result :refer :all]))
 
 (defn create-todo [todo user]
-  (if (insert "todos" (merge todo {:username (:username user)}))
+  (if (insert "todos" (merge todo (select-keys user [:username])))
     {:status 200}
     {:status 409}))
 
@@ -15,8 +15,7 @@
   )
 
 (defn get-todos [req user]
-  (if-let [todos (find-documents "todos" {:username (:username user)})]
-
+  (if-let [todos (find-documents "todos" (select-keys user [:username]))]
     {:status 200 :body {:data todos}}
     {:status 409}))
 

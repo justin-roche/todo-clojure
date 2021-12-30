@@ -38,16 +38,17 @@
 ;;   (test-utils/create-auth-header "A"))
 
 (t/deftest auth
-  (let [r (me-req)
-        s (:status r)
-        u (:user (:body r))]
-    (t/is (= 200 s))
-    (t/is (= "A" (:name u))))
+  (t/testing "/me endpoint returns user data (token matches user)"
+    (let [r (me-req)
+          s (:status r)
+          u (:data (:body r))]
+      (t/is (= 200 s))
+      (t/is (= "A" (:name u))))
 
-  (t/is (= 200 (:status (login-req)))))
+    (t/is (= 200 (:status (login-req))))))
 
-(t/deftest auth-errors
-  (t/is (= 401 (:status (invalid-token-req))))
-  (t/is (= 401 (:status (invalid-login-req)))))
+;; (t/deftest auth-errors
+;;   (t/is (= 401 (:status (invalid-token-req))))
+;;   (t/is (= 401 (:status (invalid-login-req)))))
 
 (use-fixtures :each system-fixture)

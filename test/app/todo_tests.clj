@@ -30,15 +30,18 @@
     (t/is (= 1 (count (:data (:body todos)))))))
 
 (deftest create-todo-requests
-  (let [b (create-todo-req {:name "swim"} "B")
-        a (create-todo-req {:name "swim"} "A")]
-    (t/is (= 200 (:status b)))
-    (t/is (= 200 (:status a))))
-  (let [todos (get-todos-req "A")]
-    (t/is (= 200 (:status todos)))
-    (t/is (= 1 (count (:data (:body todos))))))
-  (let [todos (get-todos-req "B")]
-    (t/is (= 200 (:status todos)))
-    (t/is (= 1 (count (:data (:body todos)))))))
+  (t/testing "get todos returns correct todos for different users"
+    (let [b (create-todo-req {:name "swim"} "B")
+          a (create-todo-req {:name "swim"} "A")
+          a2 (create-todo-req {:name "run"} "A")]
+      (t/is (= 200 (:status b)))
+      (t/is (= 200 (:status a)))
+      (t/is (= 200 (:status a2))))
+    (let [todos (get-todos-req "A")]
+      (t/is (= 200 (:status todos)))
+      (t/is (= 2 (count (:data (:body todos))))))
+    (let [todos (get-todos-req "B")]
+      (t/is (= 200 (:status todos)))
+      (t/is (= 1 (count (:data (:body todos))))))))
 
 (use-fixtures :each system-fixture)

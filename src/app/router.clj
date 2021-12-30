@@ -38,27 +38,23 @@
              {:interceptors [errors/errors-handler]}
              ["/login"
               {:post
-               {:handler (fn [rq]
-                           (auth/login rq))
+               {:handler auth/login
                 :parameters {:body [:map
                                     [:password string?]
                                     [:username string?]]}}}]
              ["/me"
               {:get
-               {:handler (fn [rq]
-                           (users/get-me rq))
+               {:handler users/get-me
                 :interceptors [(auth/verify-token)]}}]
-             ["/users"
-              {:get {:handler (fn [rq]
-                                (users/get-users))}}]
-
              ["/todos"
               {:get {:handler (fn [rq]
-                                (todos/get-todos (:body-params rq) (:user rq)))
+                                (todos/get-todos (:body-params rq)
+                                                 (:user rq)))
                      :interceptors [(auth/verify-token)]}}]
              ["/todo/"
               {:post {:handler (fn [rq]
-                                 (todos/create-todo (:body-params rq) (:user rq)))
+                                 (todos/create-todo (:body-params rq)
+                                                    (:user rq)))
                       :interceptors [(auth/verify-token)]}}]
              ["/todo/{id}"
               {:delete {:handler (fn [rq]

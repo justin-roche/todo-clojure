@@ -1,22 +1,18 @@
 (ns app.user-tests
   (:require
-   [app.test-data :as test-data :refer [auth-headers]]
-   [app.test-utils :as test-utils :refer [get-options system-fixture]]
+   [aprint.core :refer [aprint]]
+   [buddy.hashers :as buddy-hashers]
+   [app.db :as db]
+   [clojure.tools.reader]
+   [app.users :as users]
+   [cheshire.core :as cheshire]
+
+   [app.test-utils :as test-utils :refer [get-options post-options system-fixture]]
    [clj-http.client :as client]
+   [clojure.data.json :as json]
+   [app.test-data :as test-data :refer [auth-headers invalid-auth-headers non-admin-auth-headers]]
    [clojure.test :as t :refer [deftest use-fixtures]]
-   [clojure.tools.reader]))
-
-(defn get-users-req []
-  (let [o (merge (get-options) auth-headers)
-        r (client/get "http://localhost:8890/users" (get-options))]
-    r))
-
-(defn get-user-req [id]
-  (client/get (str "http://localhost:8890/user/" id)  (get-options)))
-
-(deftest user-requests
-  (let [users (get-users-req)]
-    (t/is (= 200 (:status users)))
-    (t/is (= 2 (count (:users (:body users)))))))
+   [mount.core :as mount :refer [start stop]]
+   [app.utils :as utils]))
 
 (use-fixtures :each system-fixture)

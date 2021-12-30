@@ -52,9 +52,7 @@
   (stop)
   (start)
   (db/reset-db)
-  (t/is (= 0 (count (:users (:body (users/get-users))))))
   (users/add-users test-data/test-users)
-  (t/is (= 2 (count (:users (:body (users/get-users))))))
   (stop))
 
 (defn system-fixture [test]
