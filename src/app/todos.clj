@@ -1,6 +1,6 @@
 (ns app.todos
   (:require
-   [app.db :refer [find-documents insert-subdocument filter-subdocuments]]
+   [app.db :refer [insert-subdocument filter-subdocuments update-subdocument]]
    [app.utils :as utils]
    [cheshire.core :refer :all]
    [monger.result :refer :all]))
@@ -12,16 +12,20 @@
       {:status 200}
       {:status 409})))
 
-(defn delete-todo [todo-id]
-  ;; (if (insert "todos" (merge todo {:user user})) {:status 200} {:status 409})
-  )
-
-(defn get-todos [req user]
-  (if-let [todos
-           (filter-subdocuments (:username user))]
-    {:status 200 :body {:data todos}}
+(defn update-todo [todo-id user]
+  (if (update-subdocument "users" {:name (get-in user [:username]) "todos.id" todo-id} {"todos.$.status" "completed"})
+    {:status 200}
     {:status 409}))
 
-(comment (app.utils/with-mount (fn [])))
+(defn delete-todo [todo-id user]
+  (if (update-subdocument "users" {:name "A" "todos.id" todo-id} {"todos.$.visibility" "deleted"})
+    {:status 200}
+    {:status 409}))
+
+(defn get-todos [req user]
+  (if-let [todos (filter-subdocuments (:username user))]
+    {:status 200 :body {:data todos}}
+    {:status 200 :body {:data []}}))
+
 
 

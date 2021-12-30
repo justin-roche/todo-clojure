@@ -57,6 +57,9 @@
                                                     (:user rq)))
                       :interceptors [(auth/verify-token)]}}]
              ["/todo/{id}"
-              {:delete {:handler (fn [rq]
-                                   (todos/delete-todo (:id (:path-params rq))))}}]])
+              {:post {:handler (fn [rq]
+                                 (todos/update-todo (:id (:path-params rq))))}
+
+               :delete {:handler (fn [rq]
+                                   (todos/delete-todo (:id (:path-params rq)) (:user rq)))}}]])
 

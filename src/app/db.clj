@@ -36,7 +36,6 @@
 
 (defn reset-db []
   (mc/purge-many (:db conn) ["users"])
-  (mc/purge-many (:db conn) ["todos"])
   {:status 200})
 
 (defn insert [coll item]
@@ -54,7 +53,7 @@
                                "users"
                                [{mo/$match {:name username}}
                                 {mo/$unwind "$todos"}
-                                                                               ;; {mo/$match {"todos.visibility" {"$not" {"$eq" "deleted"}}}}
+                                {mo/$match {"todos.visibility" {"$not" {"$eq" "deleted"}}}}
                                 {mo/$group {:_id "$name" :todos {mo/$push "$todos"}}}]
                                :cursor {:batch-size 10}))))
 
@@ -62,7 +61,7 @@
   (mc/update (:db conn)
              collection
              query
-             {:$set  setter}))
+             {:$set setter}))
 
 (defn find-by-id [coll id]
   (mc/find-by-id (:db conn) coll  (object-id id)))
@@ -80,15 +79,14 @@
 (defn insert-multiple [coll items]
   (mr/acknowledged? (mc/insert-batch (:db conn) coll items)))
 
-(comment (utils/with-mount (fn []
-                             (do (insert-subdocument "users" {:name "A"} "todos" {:name "write" :status "incomplete"})
+(utils/with-mount (fn []
+                    (do (insert-subdocument "users" {:name "A"} "todos" {:name "write" :status "incomplete"})
                         ;; (utils/log-through (find-documents "users" {:name "A"}))
 ;;                         (insert-subdocument "users" {:name "A"} "todos" {:name "read" :status "incomplete"})
 ;;                         (insert-subdocument "users" {:name "A"} "todos" {:name "take out trash" :status "incomplete" :visibility "deleted"})
 ;;                         ;; (insert-subdocument "users" {:name "A"} "todos" {:name "party" :status "complete"})
 ;;                         ;; (insert-subdocument "users" {:name "A"} "todos" {:name "walk" :status "complete"})
-;;                         (update-subdocument "users" {:name "A" "todos.name" "read"} {"todos.$.status" "complete"})
+                        (update-subdocument "users" {:name "A" "todos.name" "read"} {"todos.$.visibility" "deleted"})
 
                         ;; (utils/log-through "r" (filter-subdocuments {}))
-;;                         ;; (utils/log-through "result:" (find-document "users" {:name "A"}))
-                                 ))))
+                        (utils/log-through "result:" (find-document "users" {:name "A"})))))
