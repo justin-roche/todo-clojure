@@ -34,9 +34,6 @@
         r (client/post "http://localhost:8890/login" (post-options j))]
     r))
 
-;; (t/deftest auth-header
-;;   (test-utils/create-auth-header "A"))
-
 (t/deftest auth
   (t/testing "/me endpoint returns user data (token matches user)"
     (let [r (me-req)

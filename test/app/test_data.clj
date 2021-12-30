@@ -3,12 +3,9 @@
    [buddy.hashers :as buddy-hashers]
    [clojure.tools.reader]))
 
-(def test-users [{:name "B" :password (buddy-hashers/encrypt "koira12")
-                  :age 19
-                  :roles    ["admin" "user"]}
-                 {:name "A" :password (buddy-hashers/encrypt "kissa13")
-                  :age 19
-                  :roles    ["user"]}])
+(def test-users [{:name "B" :password (buddy-hashers/encrypt "koira12")}
+
+                 {:name "A" :password (buddy-hashers/encrypt "kissa13")}])
 
 (def auth-headers {:headers {"Authorization" "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6IkEiLCJleHAiOjE2NDE1ODUzNTV9.xLOVSdVWONuvX_oeCKAFlbIzvA-aUwCSZKvO9AJzESenKAJrvfG6kg1fJJjZ38EitOXxhRExvlgX0uONBMwi-Q"}})
 

@@ -23,11 +23,20 @@
     r))
 
 (deftest create-todo-requests
-  (let [todos (create-todo-req {:name "swim"} "A")]
-    (t/is (= 200 (:status todos))))
-  (let [todos (get-todos-req "A")]
-    (t/is (= 200 (:status todos)))
-    (t/is (= 1 (count (:data (:body todos)))))))
+  (t/testing "creates todos for a user"
+    (let [todos (create-todo-req {:name "swim"} "A")]
+      (t/is (= 200 (:status todos))))
+    (let [todos (get-todos-req "A")]
+      (t/is (= 200 (:status todos)))
+      (t/is (= 1 (count (:data (:body todos))))))))
+
+(deftest create-todo-requests
+  (t/testing "creates todos for a user"
+    (let [todos (create-todo-req {:name "swim"} "A")]
+      (t/is (= 200 (:status todos))))
+    (let [todos (get-todos-req "A")]
+      (t/is (= 200 (:status todos)))
+      (t/is (= 1 (count (:data (:body todos))))))))
 
 (deftest create-todo-requests
   (t/testing "get todos returns correct todos for different users"

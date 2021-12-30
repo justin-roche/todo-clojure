@@ -6,16 +6,6 @@
    [monger.result :refer :all]
    [app.auth :as auth :refer [create-token verify-login]]))
 
-(defn add-users [users]
-  (if (insert-multiple "users" users)
-    {:status 200}
-    {:status 409}))
-
-(defn search-user [q]
-  (if-let [user (find-document "users" q)]
-    {:status 200 :body {:data user}}
-    {:status 409}))
-
 (defn login [rq]
   (let [username (get-in rq [:body-params :username])
         password (get-in rq [:body-params :password])]
@@ -26,7 +16,14 @@
        {:message "Authorization success"}}
       {:status 401})))
 
-(defn get-me [req]
-  (search-user {:name (get-in req [:user :username])}))
+(defn add-users [users]
+  (if (insert-multiple "users" users)
+    {:status 200}
+    {:status 409}))
 
+(defn get-me [req]
+  (if-let [user (find-document "users"
+                               {:name (get-in req [:user :username])})]
+    {:status 200 :body {:data user}}
+    {:status 409}))
 

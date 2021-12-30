@@ -11,9 +11,9 @@
    [monger.core :as mg]
    [monger.credentials :as mgc]
    [monger.db :as mdb]
-   [monger.operators :refer :all]
+   [monger.operators :as mo :refer :all]
    [monger.result :as mr]
-   [monger.util :refer :all]
+   [monger.util :as mu :refer :all]
    [mount.core :refer [defstate]]))
 
 (defn db-connect [{:keys [cred-db cred-user cred-password host port db]}]
@@ -31,7 +31,7 @@
 (defn get-id-string [d]
   (str/replace (mcv/from-db-object (get-in d [:_id]) true) "\"" ""))
 
-(defn change-id-string [d]
+(defn convert-bson-id-to-string [d]
   (dissoc (assoc d :id (get-id-string d)) :_id))
 
 (defn reset-db []
@@ -42,22 +42,53 @@
 (defn insert [coll item]
   (mc/insert-and-return (:db conn) coll item))
 
+(defn insert-subdocument "Insert a subdocument, providing a string uuid"
+  [collection query subdocument-key document]
+  (mc/update (:db conn)
+             collection
+             query
+             {:$push  {(keyword subdocument-key)  (merge document {:id (mu/random-uuid)})}}))
+
+(defn filter-subdocuments [username]
+  (:todos (first (mc/aggregate (:db conn)
+                               "users"
+                               [{mo/$match {:name username}}
+                                {mo/$unwind "$todos"}
+                                                                               ;; {mo/$match {"todos.visibility" {"$not" {"$eq" "deleted"}}}}
+                                {mo/$group {:_id "$name" :todos {mo/$push "$todos"}}}]
+                               :cursor {:batch-size 10}))))
+
+(defn update-subdocument [collection query setter]
+  (mc/update (:db conn)
+             collection
+             query
+             {:$set  setter}))
+
 (defn find-by-id [coll id]
   (mc/find-by-id (:db conn) coll  (object-id id)))
 
 (defn find-document [coll q]
   (if-let [r (mc/find-one-as-map  (:db conn) coll q)]
-    (change-id-string r)
+    (convert-bson-id-to-string r)
     nil))
 
 (defn find-documents [coll q]
   (if-let [r (mc/find-maps (:db conn) coll q)]
-    (map change-id-string r)
+    (map convert-bson-id-to-string r)
     nil))
 
 (defn insert-multiple [coll items]
   (mr/acknowledged? (mc/insert-batch (:db conn) coll items)))
 
-(defn update-fields [coll q u]
-  (mc/update (:db conn) coll q {$set u}))
+(comment (utils/with-mount (fn []
+                             (do (insert-subdocument "users" {:name "A"} "todos" {:name "write" :status "incomplete"})
+                        ;; (utils/log-through (find-documents "users" {:name "A"}))
+;;                         (insert-subdocument "users" {:name "A"} "todos" {:name "read" :status "incomplete"})
+;;                         (insert-subdocument "users" {:name "A"} "todos" {:name "take out trash" :status "incomplete" :visibility "deleted"})
+;;                         ;; (insert-subdocument "users" {:name "A"} "todos" {:name "party" :status "complete"})
+;;                         ;; (insert-subdocument "users" {:name "A"} "todos" {:name "walk" :status "complete"})
+;;                         (update-subdocument "users" {:name "A" "todos.name" "read"} {"todos.$.status" "complete"})
 
+                        ;; (utils/log-through "r" (filter-subdocuments {}))
+;;                         ;; (utils/log-through "result:" (find-document "users" {:name "A"}))
+                                 ))))
