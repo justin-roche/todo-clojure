@@ -1,11 +1,8 @@
 (ns app.auth
   (:require
-   [app.utils :as utils :refer [log-through xlog-through]]
+   [app.utils :as utils :refer [log-through]]
    [buddy.hashers :as buddy-hashers]
    [buddy.sign.jwt :as jwt]
-   [clojure.set :refer [subset?]]
-   [io.pedestal.log :as pl]
-   [malli.core :as m]
    [app.db :as db]))
 
 (def private-key
@@ -35,16 +32,11 @@
            user-data (unsign-token token)]
        (utils/update-req ctx {:user user-data})))})
 
-(defn login [rq]
-  (let [username (get-in rq [:body-params :username])
-        password (get-in rq [:body-params :password])
-        user (db/find-document "users" {:name username})]
+(defn get-user-from-login [username password]
+  (let [user (db/find-document "users" {:name username})]
     (if (and user (buddy-hashers/check password (:password user)))
-      {:status 200
-       :token (create-token user)
-       :body
-       {:message "Authorization success"}}
-      {:status 401})))
+      user
+      nil)))
 
 (comment (app.utils/with-mount (fn []
                                  (log-through "user token" (create-token {:username "A"})))))

@@ -38,7 +38,7 @@
              {:interceptors [errors/errors-handler]}
              ["/login"
               {:post
-               {:handler auth/login
+               {:handler users/login
                 :parameters {:body [:map
                                     [:password string?]
                                     [:username string?]]}}}]

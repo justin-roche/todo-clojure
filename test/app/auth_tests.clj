@@ -43,8 +43,10 @@
           s (:status r)
           u (:data (:body r))]
       (t/is (= 200 s))
-      (t/is (= "A" (:name u))))
+      (t/is (= "A" (:name u))))))
 
+(t/deftest login
+  (t/testing "/login endpoint logs in user"
     (t/is (= 200 (:status (login-req))))))
 
 ;; (t/deftest auth-errors
