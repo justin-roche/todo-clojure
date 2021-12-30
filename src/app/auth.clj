@@ -32,7 +32,7 @@
            user-data (unsign-token token)]
        (utils/update-req ctx {:user user-data})))})
 
-(defn get-user-from-login [username password]
+(defn verify-login [username password]
   (let [user (db/find-document "users" {:name username})]
     (if (and user (buddy-hashers/check password (:password user)))
       user

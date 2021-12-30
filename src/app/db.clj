@@ -25,7 +25,7 @@
 (defn db-disconnect [connection]
   mg/disconnect connection)
 
-(defstate conn :start (db-connect config-map)
+(defstate conn :start (db-connect (:db config-map))
   :stop (db-disconnect conn))
 
 (defn get-id-string [d]
