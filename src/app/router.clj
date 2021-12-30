@@ -48,8 +48,8 @@
                 :interceptors [(auth/verify-token)]}}]
              ["/todos"
               {:get {:handler (fn [rq]
-                                (todos/get-todos (:body-params rq)
-                                                 (:user rq)))
+                                (todos/get-todos
+                                 (:user rq)))
                      :interceptors [(auth/verify-token)]}}]
              ["/todo/"
               {:post {:handler (fn [rq]
@@ -58,8 +58,11 @@
                       :interceptors [(auth/verify-token)]}}]
              ["/todo/{id}"
               {:post {:handler (fn [rq]
-                                 (todos/update-todo (:id (:path-params rq))))}
+                                 (todos/update-todo (:id (:path-params rq)) (:body-params rq) (:user rq)))
+                      :interceptors [(auth/verify-token)]}
 
                :delete {:handler (fn [rq]
-                                   (todos/delete-todo (:id (:path-params rq)) (:user rq)))}}]])
+                                   (todos/delete-todo (:id (:path-params rq)) (:user rq)))
+
+                        :interceptors [(auth/verify-token)]}}]])
 

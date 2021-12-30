@@ -12,17 +12,20 @@
       {:status 200}
       {:status 409})))
 
-(defn update-todo [todo-id user]
-  (if (update-subdocument "users" {:name (get-in user [:username]) "todos.id" todo-id} {"todos.$.status" "completed"})
-    {:status 200}
-    {:status 409}))
+(defn update-todo [todo-id data user]
+  (let [username (get-in user [:username])]
+    (if (update-subdocument "users" {:name username "todos.id" todo-id}
+                            {"todos.$.status" (:status data)})
+      {:status 200}
+      {:status 409})))
 
 (defn delete-todo [todo-id user]
-  (if (update-subdocument "users" {:name "A" "todos.id" todo-id} {"todos.$.visibility" "deleted"})
-    {:status 200}
-    {:status 409}))
+  (let [username (get-in user [:username])]
+    (if (update-subdocument "users" {:name username "todos.id" todo-id} {"todos.$.visibility" "deleted"})
+      {:status 200}
+      {:status 409})))
 
-(defn get-todos [req user]
+(defn get-todos [user]
   (if-let [todos (filter-subdocuments (:username user))]
     {:status 200 :body {:data todos}}
     {:status 200 :body {:data []}}))

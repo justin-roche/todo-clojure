@@ -81,12 +81,6 @@
 
 (utils/with-mount (fn []
                     (do (insert-subdocument "users" {:name "A"} "todos" {:name "write" :status "incomplete"})
-                        ;; (utils/log-through (find-documents "users" {:name "A"}))
-;;                         (insert-subdocument "users" {:name "A"} "todos" {:name "read" :status "incomplete"})
-;;                         (insert-subdocument "users" {:name "A"} "todos" {:name "take out trash" :status "incomplete" :visibility "deleted"})
-;;                         ;; (insert-subdocument "users" {:name "A"} "todos" {:name "party" :status "complete"})
-;;                         ;; (insert-subdocument "users" {:name "A"} "todos" {:name "walk" :status "complete"})
                         (update-subdocument "users" {:name "A" "todos.name" "read"} {"todos.$.visibility" "deleted"})
 
-                        ;; (utils/log-through "r" (filter-subdocuments {}))
                         (utils/log-through "result:" (find-document "users" {:name "A"})))))
