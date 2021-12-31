@@ -50,6 +50,11 @@
                                 (todos/get-todos
                                  (:user rq)))
                      :interceptors [(auth/verify-token)]}}]
+             ["/todos/completion-report"
+              {:get {:handler (fn [rq]
+                                (todos/get-completion-report
+                                 (:user rq)))
+                     :interceptors [(auth/verify-token)]}}]
              ["/todo/"
               {:post {:handler (fn [rq]
                                  (todos/create-todo (:body-params rq)

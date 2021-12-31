@@ -49,10 +49,10 @@
              {:$push  {(keyword subdocument-key)  (merge document {:id (mu/random-uuid)})}}))
 
 (defn filter-subdocuments [collection pipeline]
-  (:result (first (mc/aggregate (:db conn)
-                                collection
-                                pipeline
-                                :cursor {}))))
+  (mc/aggregate (:db conn)
+                collection
+                pipeline
+                :cursor {}))
 
 (defn update-subdocument [collection query setter]
   (mc/update (:db conn)

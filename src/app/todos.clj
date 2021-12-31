@@ -52,13 +52,23 @@
       {:status 409})))
 
 (defn get-todos [user]
-  (if-let [todos (filter-subdocuments "users"
-                                      [{mo/$match (select-keys user [:name])}
-                                       {mo/$unwind "$todos"}
-                                       {mo/$match {"todos.visibility" {"$not" {"$eq" "deleted"}}}}
-                                       {mo/$group {:_id "$name" :result {mo/$push "$todos"}}}])]
+  (if-let [todos (:result (first (filter-subdocuments "users"
+                                                      [{mo/$match (select-keys user [:name])}
+                                                       {mo/$unwind "$todos"}
+                                                       {mo/$match {"todos.visibility" {"$not" {"$eq" "deleted"}}}}
+                                                       {mo/$group {:_id "$name" :result {mo/$push "$todos"}}}])))]
     {:status 200 :body {:data todos}}
     {:status 200 :body {:data []}}))
 
+(defn get-completion-report [user]
+  (if-let [todos (filter-subdocuments "users"
+                                      [{"$match" (select-keys user [:name])}
+                                       {"$unwind" "$todos"}
+                                       {"$match" {"todos.visibility" {"$not" {"$eq" "deleted"}}}}
+                                       {"$group" {:_id "$todos.status" :result {mo/$push "$todos"}}}
+                                       {"$sort" {"_id" 1}}])]
 
+    {:status 200 :body {:data {:complete (:result (first todos))
+                               :incomplete (:result (second todos))}}}
+    {:status 200 :body {:data []}}))
 
