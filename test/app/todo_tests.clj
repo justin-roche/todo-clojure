@@ -180,4 +180,25 @@
           (t/is (= 6 (count report)))
           (t/is (= "completion" (:type (last report)))))))))
 
+(deftest burn-down-report-request-deletions
+  (t/testing "burn down report includes deletions"
+    (let [t1 (create-todo-req {:name "run"} "A")
+          t2 (create-todo-req {:name "swim"} "A")
+          t3 (create-todo-req {:name "cook"} "A")
+          t4 (create-todo-req {:name "read"} "A")
+          t5 (create-todo-req {:name "write"} "A")])
+    (let [todos (get-todos-req "A")]
+      (t/is (= 200 (:status todos)))
+      (let [id1 (:id (first (:data (:body todos))))
+            id2 (:id (second (:data (:body todos))))]
+        (let [todos (update-todo-req id1 {} "A")]
+          (t/is (= 200 (:status todos))))
+        (let [todos (delete-todo-req id2 "A")]
+          (t/is (= 200 (:status todos))))
+        (let [report-res (burn-down-report-req "A")
+              report (:data (:body report-res))]
+          (t/is (= 200 (:status report-res)))
+          (t/is (= 7 (count report)))
+          (t/is (= "deletion" (:type (last report)))))))))
+
 (use-fixtures :each system-fixture)

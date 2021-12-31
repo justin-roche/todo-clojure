@@ -25,7 +25,7 @@
     r))
 
 (t/deftest me-endpoint
-  (t/testing "/me endpoint returns user data (token matches user)"
+  (t/testing "/me endpoint returns user data (demonstrates that token matches user)"
     (let [r (me-req "A")
           s (:status r)
           u (:data (:body r))]

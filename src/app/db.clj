@@ -48,7 +48,7 @@
              query
              {:$push  {(keyword subdocument-key)  (merge document {:id (mu/random-uuid)})}}))
 
-(defn filter-subdocuments [collection pipeline]
+(defn aggregate-subdocuments [collection pipeline]
   (mc/aggregate (:db conn)
                 collection
                 pipeline
