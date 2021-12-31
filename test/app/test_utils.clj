@@ -1,26 +1,17 @@
 (ns app.test-utils
   (:require
-   [aprint.core :refer [aprint]]
-   [buddy.hashers :as buddy-hashers]
+   [app.auth :as auth]
    [app.db :as db]
-   [clojure.tools.reader]
-   [app.users :as users]
-   [cheshire.core :as cheshire]
-   [clj-http.client :as client]
-   [clojure.data.json :as json]
-   [clojure.test :as t :refer [deftest use-fixtures]]
-   [mount.core :as mount :refer [start stop]]
-   [app.utils :as utils]
    [app.test-data :as test-data]
-   [app.auth :as auth]))
+   [app.users :as users]
+   [clojure.tools.reader]
+   [mount.core :as mount :refer [start stop]]))
 
 (def base "http://localhost:8890/")
 
 (defn create-auth-header [name]
   (let [token (auth/create-token {:name name})]
     {:headers {"Authorization" token}}))
-
-(def auth-headers {:headers {"Authorization" "eyJhbGciOiJIUzUxMiJ9.eyJpZCI6MSwicm9sZXMiOlsiYWRtaW4iLCJ1c2VyIl0sImV4cCI6MTY0MDQwNjQ3MX0.K_FUbrjpPd2IJaOYnqmG8DtPe43omUueAoupCLC_c7OhCZ68jwm6DgaAlJCN1tPViFP9_-FOeZ6ofR8FxJAYMg"}})
 
 (defn get-options
   ([]

@@ -48,20 +48,20 @@
              query
              {:$push  {(keyword subdocument-key)  (merge document {:id (mu/random-uuid)})}}))
 
-(defn filter-subdocuments [name]
-  (:todos (first (mc/aggregate (:db conn)
-                               "users"
-                               [{mo/$match {:name name}}
-                                {mo/$unwind "$todos"}
-                                {mo/$match {"todos.visibility" {"$not" {"$eq" "deleted"}}}}
-                                {mo/$group {:_id "$name" :todos {mo/$push "$todos"}}}]
-                               :cursor {:batch-size 10}))))
+(defn filter-subdocuments [collection pipeline]
+  (:result (first (mc/aggregate (:db conn)
+                                collection
+                                pipeline
+                                :cursor {}))))
 
 (defn update-subdocument [collection query setter]
   (mc/update (:db conn)
              collection
              query
              {:$set setter}))
+
+(defn find-subdocument [coll doc-query subdocument-query]
+  (mc/find-one-as-map (:db conn) coll doc-query subdocument-query))
 
 (defn find-by-id [coll id]
   (mc/find-by-id (:db conn) coll  (object-id id)))
@@ -79,8 +79,8 @@
 (defn insert-multiple [coll items]
   (mr/acknowledged? (mc/insert-batch (:db conn) coll items)))
 
-(utils/with-mount (fn []
-                    (do (insert-subdocument "users" {:name "A"} "todos" {:name "write" :status "incomplete"})
-                        (update-subdocument "users" {:name "A" "todos.name" "read"} {"todos.$.visibility" "deleted"})
+(comment (utils/with-mount (fn []
+                             (do (insert-subdocument "users" {:name "A"} "todos" {:name "write" :status "incomplete"})
+                                 (update-subdocument "users" {:name "A" "todos.name" "read"} {"todos.$.visibility" "deleted"})
 
-                        (utils/log-through "result:" (find-document "users" {:name "A"})))))
+                                 (find-document "users" {:name "A"})))))

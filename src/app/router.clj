@@ -56,12 +56,12 @@
                                                     (:user rq)))
                       :interceptors [(auth/verify-token)]}}]
              ["/todo/{id}"
-              {:post {:handler (fn [rq]
-                                 (todos/update-todo (:id (:path-params rq)) (:body-params rq) (:user rq)))
-                      :interceptors [(auth/verify-token)]}
-
-               :delete {:handler (fn [rq]
+              {:delete {:handler (fn [rq]
                                    (todos/delete-todo (:id (:path-params rq)) (:user rq)))
 
-                        :interceptors [(auth/verify-token)]}}]])
+                        :interceptors [(auth/verify-token)]}}]
+             ["/todo/{id}/status"
+              {:post {:handler (fn [rq]
+                                 (todos/change-todo-status (:id (:path-params rq)) (:body-params rq) (:user rq)))
+                      :interceptors [(auth/verify-token)]}}]])
 
