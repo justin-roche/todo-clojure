@@ -55,6 +55,10 @@
                                 (todos/get-completion-report
                                  (:user rq)))
                      :interceptors [(auth/verify-token)]}}]
+             ["/todos/burn-down-report"
+              {:get {:handler (fn [rq]
+                                (todos/get-burn-down-report (:user rq)))
+                     :interceptors [(auth/verify-token)]}}]
              ["/todo/"
               {:post {:handler (fn [rq]
                                  (todos/create-todo (:body-params rq)

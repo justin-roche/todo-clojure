@@ -53,10 +53,10 @@
 
 (defn get-todos [user]
   (if-let [todos (:result (first (filter-subdocuments "users"
-                                                      [{mo/$match (select-keys user [:name])}
-                                                       {mo/$unwind "$todos"}
-                                                       {mo/$match {"todos.visibility" {"$not" {"$eq" "deleted"}}}}
-                                                       {mo/$group {:_id "$name" :result {mo/$push "$todos"}}}])))]
+                                                      [{"$match" (select-keys user [:name])}
+                                                       {"$unwind" "$todos"}
+                                                       {"$match" {"todos.visibility" {"$not" {"$eq" "deleted"}}}}
+                                                       {"$group" {:_id "$name" :result {"$push" "$todos"}}}])))]
     {:status 200 :body {:data todos}}
     {:status 200 :body {:data []}}))
 
@@ -72,3 +72,21 @@
                                :incomplete (:result (second todos))}}}
     {:status 200 :body {:data []}}))
 
+(defn get-burn-down-report [user]
+  (if-let [events (filter-subdocuments "users"
+                                       [{"$match" (select-keys user [:name])}
+                                        {"$unwind" "$todos"}
+                                        {"$facet"
+                                         {:creations [{"$project" {:_id "$todos.id" :type "creation" :eventDate "$todos.createdAt"}}]
+                                          :completions [{"$match" {"todos.completedAt" {"$exists" true}}}
+                                                        {"$project" {:_id "$todos.id" :type "completion" :eventDate "$todos.completedAt"}}]
+
+                                          :deletions [{"$match" {"todos.deletedAt" {"$exists" true}}}
+                                                      {"$project" {:_id "$todos.id" :deletedAt "$todos.deletedAt"}}]}}
+
+                                        {"$project" {:activity {"$setUnion" ["$creations" "$completions"]}}}
+                                        {"$unwind" "$activity"}
+                                        {"$replaceRoot" {:newRoot "$activity"}}
+                                        {"$sort" {"eventDate" 1}}])]
+    {:status 200 :body {:data events}}
+    {:status 200 :body {:data []}}))

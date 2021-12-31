@@ -42,6 +42,13 @@
         r (client/get url (merge (post-options j) a))]
     r))
 
+(defn burn-down-report-req [name]
+  (let [j (json/write-str {})
+        a (test-utils/create-auth-header name)
+        url "http://localhost:8890/todos/burn-down-report"
+        r (client/get url (merge (post-options j) a))]
+    r))
+
 (deftest get-todo-requests
   (t/testing "get todos returns an empty array if there are no todos"
     (let [todos (get-todos-req "A")]
@@ -154,5 +161,23 @@
       (t/is (= 3 (count (:incomplete (:data (:body todos))))))
       (t/is (vector? (:incomplete (:data (:body todos)))))
       (t/is (vector? (:incomplete (:data (:body todos))))))))
+
+(deftest burn-down-report-request
+  (t/testing "creates burn down report for a user"
+    (let [t1 (create-todo-req {:name "run"} "A")
+          t2 (create-todo-req {:name "swim"} "A")
+          t3 (create-todo-req {:name "cook"} "A")
+          t4 (create-todo-req {:name "read"} "A")
+          t5 (create-todo-req {:name "write"} "A")])
+    (let [todos (get-todos-req "A")]
+      (t/is (= 200 (:status todos)))
+      (let [id (:id (first (:data (:body todos))))]
+        (let [todos (update-todo-req id {} "A")]
+          (t/is (= 200 (:status todos))))
+        (let [report-res (burn-down-report-req "A")
+              report (:data (:body report-res))]
+          (t/is (= 200 (:status report-res)))
+          (t/is (= 6 (count report)))
+          (t/is (= "completion" (:type (last report)))))))))
 
 (use-fixtures :each system-fixture)
