@@ -25,19 +25,13 @@
                    (get-in config-map [:auth :auth-key]) {:alg :hs512})
        (catch Exception e (throw e))))
 
-(defn verify-token []
+(defn verify-token [exclusions]
   {:name ::verify-token
    :enter
    (fn [ctx]
-     (let [token (have string?
-                       (get-in ctx [:request :headers "authorization"]))
-           user-data (unsign-token token)]
-       (utils/update-req ctx {:user user-data})))})
-
-(comment (app.utils/with-mount (fn []
-                                 (log-through "user token" (create-token {:name "A"})))))
-
-
-
-
-
+     (if (some #(= (:uri (:request ctx)) %) exclusions)
+       ctx
+       (let [token (have string?
+                         (get-in ctx [:request :headers "authorization"]))
+             user-data (unsign-token token)]
+         (utils/update-req ctx {:user user-data}))))})

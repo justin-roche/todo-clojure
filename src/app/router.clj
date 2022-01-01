@@ -33,32 +33,24 @@
                                        (multipart/multipart-interceptor)]}})
 
 (def routes [""
-             {:interceptors [errors/errors-handler]}
+             {:interceptors [errors/errors-handler (auth/verify-token ["/login"])]}
              ["/login"
               {:post
                {:handler #(users/login (:body-params %1))
                 :parameters {:body [:map
                                     [:name string?]]}}}]
              ["/me"
-              {:get
-               {:handler users/get-me
-                :interceptors [(auth/verify-token)]}}]
+              {:get {:handler users/get-me}}]
              ["/todos"
-              {:get {:handler #(todos/get-todos (:user %1))
-                     :interceptors [(auth/verify-token)]}}]
+              {:get {:handler #(todos/get-todos (:user %1))}}]
              ["/todos/completion-report"
-              {:get {:handler #(todos/get-completion-report (:user %1))
-                     :interceptors [(auth/verify-token)]}}]
+              {:get {:handler #(todos/get-completion-report (:user %1))}}]
              ["/todos/burn-down-report"
-              {:get {:handler #(todos/get-burn-down-report (:user %1))
-                     :interceptors [(auth/verify-token)]}}]
+              {:get {:handler #(todos/get-burn-down-report (:user %1))}}]
              ["/todo"
-              {:post {:handler #(todos/create-todo (:body-params %1) (:user %1))
-                      :interceptors [(auth/verify-token)]}}]
+              {:post {:handler #(todos/create-todo (:user %1) (:body-params %1))}}]
              ["/todo/{id}"
-              {:delete {:handler #(todos/delete-todo (:id (:path-params %1)) (:user %1))
-                        :interceptors [(auth/verify-token)]}}]
+              {:delete {:handler #(todos/delete-todo (:user %1) (:id (:path-params %1)))}}]
              ["/todo/{id}/status"
-              {:post {:handler #(todos/change-todo-status (:id (:path-params %1)) (:body-params %1) (:user %1))
-                      :interceptors [(auth/verify-token)]}}]])
+              {:post {:handler #(todos/change-todo-status (:user %1) (:id (:path-params %1)))}}]])
 

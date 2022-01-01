@@ -13,7 +13,7 @@
                             {"id" todo-id}}}
                   {"name" 1 "todos.$" 1}))))
 
-(defn create-todo [todo user]
+(defn create-todo [user todo]
   (let [name (get-in user [:name])
         todo (merge {:status "incomplete"
                      :visibility "visible"
@@ -24,7 +24,7 @@
       {:status 200}
       {:status 409})))
 
-(defn change-todo-status [todo-id data user]
+(defn change-todo-status [user todo-id]
   (let [name (get-in user [:name])
         todo (_get-todo name todo-id)
         completeNow (= "incomplete" (:status todo))
@@ -37,7 +37,7 @@
       {:status 200}
       {:status 409})))
 
-(defn delete-todo [todo-id user]
+(defn delete-todo [user todo-id]
   (let [name (get-in user [:name])]
     (if (update-subdocument "users"
                             {:name name "todos.id" todo-id}
