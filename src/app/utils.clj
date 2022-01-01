@@ -1,8 +1,7 @@
 (ns app.utils
   (:require
    [aprint.core :refer [aprint]]
-   [sc.api :as sc :refer [spy letsc defsc ep-info]]
-   [mount.core :refer [start defstate stop]]))
+   [mount.core :refer [start stop]]))
 
 (defn with-mount [test]
   (start)

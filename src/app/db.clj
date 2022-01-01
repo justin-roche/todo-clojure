@@ -1,19 +1,13 @@
 (ns app.db
   (:require
    [app.config :refer [config-map]]
-   [app.user]
-   [app.utils :as utils]
-   [cheshire.core :refer [generate-string]]
-   [clojure.data.json :as json]
    [clojure.string :as str]
    [monger.collection :as mc]
    [monger.conversion :as mcv]
    [monger.core :as mg]
    [monger.credentials :as mgc]
-   [monger.db :as mdb]
-   [monger.operators :as mo :refer :all]
    [monger.result :as mr]
-   [monger.util :as mu :refer :all]
+   [monger.util :as mu]
    [mount.core :refer [defstate]]))
 
 (defn db-connect [{:keys [cred-db cred-user cred-password host port db]}]
@@ -64,7 +58,7 @@
   (mc/find-one-as-map (:db conn) coll doc-query subdocument-query))
 
 (defn find-by-id [coll id]
-  (mc/find-by-id (:db conn) coll  (object-id id)))
+  (mc/find-by-id (:db conn) coll  (mu/object-id id)))
 
 (defn find-document [coll q]
   (if-let [r (mc/find-one-as-map  (:db conn) coll q)]

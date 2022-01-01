@@ -1,10 +1,9 @@
 (ns app.users
   (:require
+   [app.auth :as auth :refer [create-token]]
    [app.db :refer [find-document insert insert-multiple]]
-   [app.utils :refer [log-through]]
    [cheshire.core :refer :all]
-   [monger.result :refer :all]
-   [app.auth :as auth :refer [create-token]]))
+   [monger.result :refer :all]))
 
 (def email-regexp #".+\@.+\..+")
 
