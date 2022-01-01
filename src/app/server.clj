@@ -1,7 +1,7 @@
 (ns app.server
   (:require
    [app.config :refer [config-map]]
-   [app.router :as r]
+   [app.router :as r :refer [routes route-data]]
    [io.pedestal.http :as ps]
    [io.pedestal.http :as http]
    [mount.core :as mount :refer [defstate]]
@@ -15,7 +15,7 @@
       (ps/default-interceptors)
       (pedestal/replace-last-interceptor
        (pedestal/routing-interceptor
-        (rt/router r/routes r/route-data)))
+        (rt/router routes route-data)))
       (ps/dev-interceptors)
       (ps/create-server)
       (ps/start)))

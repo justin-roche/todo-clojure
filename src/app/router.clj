@@ -22,7 +22,6 @@
 
 (def route-data {:data {:coercion reitit.coercion.malli/coercion
                         :muuntaja m/instance
-
                         :interceptors [(muuntaja/format-request-interceptor)
                                        (parameters/parameters-interceptor)
                                        (muuntaja/format-negotiate-interceptor)
@@ -34,13 +33,10 @@
                                        (multipart/multipart-interceptor)]}})
 
 (def routes [""
-
              {:interceptors [errors/errors-handler]}
              ["/login"
               {:post
-               {:handler (fn [rq]
-                           (users/login
-                            (:body-params rq)))
+               {:handler #(users/login (:body-params %1))
                 :parameters {:body [:map
                                     [:name string?]]}}}]
              ["/me"
@@ -48,31 +44,21 @@
                {:handler users/get-me
                 :interceptors [(auth/verify-token)]}}]
              ["/todos"
-              {:get {:handler (fn [rq]
-                                (todos/get-todos
-                                 (:user rq)))
+              {:get {:handler #(todos/get-todos (:user %1))
                      :interceptors [(auth/verify-token)]}}]
              ["/todos/completion-report"
-              {:get {:handler (fn [rq]
-                                (todos/get-completion-report
-                                 (:user rq)))
+              {:get {:handler #(todos/get-completion-report (:user %1))
                      :interceptors [(auth/verify-token)]}}]
              ["/todos/burn-down-report"
-              {:get {:handler (fn [rq]
-                                (todos/get-burn-down-report (:user rq)))
+              {:get {:handler #(todos/get-burn-down-report (:user %1))
                      :interceptors [(auth/verify-token)]}}]
              ["/todo"
-              {:post {:handler (fn [rq]
-                                 (todos/create-todo (:body-params rq)
-                                                    (:user rq)))
+              {:post {:handler #(todos/create-todo (:body-params %1) (:user %1))
                       :interceptors [(auth/verify-token)]}}]
              ["/todo/{id}"
-              {:delete {:handler (fn [rq]
-                                   (todos/delete-todo (:id (:path-params rq)) (:user rq)))
-
+              {:delete {:handler #(todos/delete-todo (:id (:path-params %1)) (:user %1))
                         :interceptors [(auth/verify-token)]}}]
              ["/todo/{id}/status"
-              {:post {:handler (fn [rq]
-                                 (todos/change-todo-status (:id (:path-params rq)) (:body-params rq) (:user rq)))
+              {:post {:handler #(todos/change-todo-status (:id (:path-params %1)) (:body-params %1) (:user %1))
                       :interceptors [(auth/verify-token)]}}]])
 

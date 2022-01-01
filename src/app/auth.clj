@@ -29,7 +29,8 @@
   {:name ::verify-token
    :enter
    (fn [ctx]
-     (let [token (get-in ctx [:request :headers "authorization"])
+     (let [token (have string?
+                       (get-in ctx [:request :headers "authorization"]))
            user-data (unsign-token token)]
        (utils/update-req ctx {:user user-data})))})
 
