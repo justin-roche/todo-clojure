@@ -48,7 +48,9 @@
              ["/todos/burn-down-report"
               {:get {:handler #(todos/get-burn-down-report (:user %1))}}]
              ["/todo"
-              {:post {:handler #(todos/create-todo (:user %1) (:body-params %1))}}]
+              {:post {:handler #(todos/create-todo (:user %1) (:body-params %1))
+                      :parameters {:body [:map
+                                          [:name string?]]}}}]
              ["/todo/{id}"
               {:delete {:handler #(todos/delete-todo (:user %1) (:id (:path-params %1)))}}]
              ["/todo/{id}/status"

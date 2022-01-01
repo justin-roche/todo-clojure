@@ -55,10 +55,10 @@
                 :cursor {}))
 
 (defn update-subdocument [collection query setter]
-  (mc/update (:db conn)
-             collection
-             query
-             {:$set setter}))
+  (mr/updated-existing? (mc/update (:db conn)
+                                   collection
+                                   query
+                                   {:$set setter})))
 
 (defn find-subdocument [coll doc-query subdocument-query]
   (mc/find-one-as-map (:db conn) coll doc-query subdocument-query))

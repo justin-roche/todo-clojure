@@ -9,17 +9,18 @@
 (defn _get-todo [username todo-id]
   (first (:todos (find-subdocument
                   "users"
-                  {"todos" {"$elemMatch"
+                  {"name" username
+                   "todos" {"$elemMatch"
                             {"id" todo-id}}}
                   {"name" 1 "todos.$" 1}))))
 
 (defn create-todo [user todo]
-  (let [name (get-in user [:name])
+  (let [username (get-in user [:name])
         todo (merge {:status "incomplete"
                      :visibility "visible"
                      :createdAt (new java.util.Date)} todo)]
     (if (insert-subdocument "users"
-                            {:name name}
+                            {:name username}
                             "todos" todo)
       {:status 200}
       {:status 409})))
@@ -62,8 +63,8 @@
                   {"$group" {:_id "$todos.status" :result {"$push" "$todos"}}}
                   {"$sort" {"_id" 1}}]]
     (if-let [todos (aggregate-subdocuments "users" pipeline)]
-      {:status 200 :body {:data {:complete (:result (first todos))
-                                 :incomplete (:result (second todos))}}}
+      {:status 200 :body {:data {:complete (or (:result (first todos)) [])
+                                 :incomplete (or (:result (second todos)) [])}}}
       {:status 200 :body {:data []}})))
 
 (defn get-burn-down-report [user]

@@ -76,6 +76,14 @@
       (t/is (= 200 (:status todos)))
       (t/is (= 1 (count (:data (:body todos))))))))
 
+(deftest invalid-create-todo-requests
+  (t/testing "validates todo has a name"
+    (let [todos (create-todo-req {} "a@gmail.com")]
+      (t/is (= 400 (:status todos))))
+    (let [todos (get-todos-req "a@gmail.com")]
+      (t/is (= 200 (:status todos)))
+      (t/is (= 0 (count (:data (:body todos))))))))
+
 (deftest create-todo-requests-for-users
   (t/testing "get todos returns correct todos for different users"
     (let [b (create-todo-req {:name "swim"} "b@yahoo.com")
@@ -108,6 +116,15 @@
         (t/is (= 1 (count (:data (:body todos)))))
         (t/is (= "read" (:name t1)))))))
 
+(deftest invalid-delete-todo
+  (t/testing "gives correct response when todo id not found"
+    (let [t1 (create-todo-req {:name "swim"} "a@gmail.com")
+          t2 (create-todo-req {:name "read"} "a@gmail.com")]
+      (t/is (= 200 (:status t1))))
+    (let [id "abc"]
+      (let [delete-res (delete-todo-req id "a@gmail.com")]
+        (t/is (= 409 (:status delete-res)))))))
+
 (deftest change-todo-status
   (t/testing "changes todo status to complete"
     (let [t1 (create-todo-req {:name "swim"} "a@gmail.com")
@@ -126,7 +143,7 @@
         (t/is (string? (:completedAt (first (:data (:body todos))))))
         (t/is (= "complete" (:status (first (:data (:body todos))))))))))
 
-(deftest change-todo-status
+(deftest change-todo-status-to-incomplete
   (t/testing "changes todo status to incomplete"
     (let [t1 (create-todo-req {:name "swim"} "a@gmail.com")
           t2 (create-todo-req {:name "read"} "a@gmail.com")]
@@ -146,6 +163,29 @@
         (t/is (= nil (:completedAt (first (:data (:body todos))))))
         (t/is (= "incomplete" (:status (first (:data (:body todos))))))))))
 
+(deftest invalid-change-todo-status
+  (t/testing "returns correct response for wrong todo id"
+    (let [t1 (create-todo-req {:name "swim"} "a@gmail.com")
+          t2 (create-todo-req {:name "read"} "a@gmail.com")]
+      (t/is (= 200 (:status t1))))
+    (let [todos (get-todos-req "a@gmail.com")]
+      (t/is (= 200 (:status todos)))
+      (t/is (= 2 (count (:data (:body todos)))))
+      (let [id "bad"]
+        (let [todos (update-todo-req id {} "a@gmail.com")]
+          (t/is (= 409 (:status todos))))))))
+
+(deftest empty-completion-report-request
+  (t/testing "creates completion report for a user"
+    (let [todos (completion-report-req "a@gmail.com")]
+      (t/is (= 200 (:status todos)))
+      (t/is (map? (:data (:body todos))))
+      (t/is (vector? (:complete (:data (:body todos)))))
+      (t/is (= 0 (count (:complete (:data (:body todos))))))
+      (t/is (= 0 (count (:incomplete (:data (:body todos))))))
+      (t/is (vector? (:incomplete (:data (:body todos)))))
+      (t/is (vector? (:incomplete (:data (:body todos))))))))
+
 (deftest completion-report-request
   (t/testing "creates completion report for a user"
     (let [t1 (create-todo-req {:name "run"} "a@gmail.com")
@@ -161,6 +201,13 @@
       (t/is (= 3 (count (:incomplete (:data (:body todos))))))
       (t/is (vector? (:incomplete (:data (:body todos)))))
       (t/is (vector? (:incomplete (:data (:body todos))))))))
+
+(deftest empty-burn-down-report-request
+  (t/testing "returns empty array of events if no todos exist"
+    (let [report-res (burn-down-report-req "a@gmail.com")
+          report (:data (:body report-res))]
+      (t/is (= 200 (:status report-res)))
+      (t/is (= 0 (count report))))))
 
 (deftest burn-down-report-request
   (t/testing "creates burn down report for a user"

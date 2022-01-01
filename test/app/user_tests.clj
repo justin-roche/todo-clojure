@@ -40,6 +40,11 @@
       (t/is (= "c@b.com" (:name (:data (:body me))))))))
 
 (deftest login
+  (t/testing "validates that username is present"
+    (let [l (login-req {})]
+      (t/is (= 400 (:status l))))))
+
+(deftest login
   (t/testing "validates that username is email address"
     (let [l (login-req {:name "john"})]
       (t/is (= 400 (:status l))))))
