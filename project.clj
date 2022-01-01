@@ -5,12 +5,9 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :main app.core/main
   :plugins [[lein-environ "1.2.0"]]
-  :dependencies [[aprint "0.1.3"]
-                 [buddy "2.0.0"]
+  :dependencies [[buddy "2.0.0"]
                  [cheshire "5.10.1"]
-                 [clj-http "3.12.3"]
                  [com.novemberain/monger "3.1.0"]
-                 [com.taoensso/timbre "5.1.2"]
                  [com.taoensso/truss "1.6.0"]
                  [environ "1.2.0"]
                  [io.pedestal/pedestal.interceptor "0.5.9"]
@@ -26,14 +23,16 @@
                  [org.clojure/clojure "1.10.3"]
                  [org.clojure/data.json "2.4.0"]
                  [org.clojure/java.jdbc "0.7.8"]
-                 [org.clojure/tools.namespace "1.2.0"]
-                 [org.clojure/tools.reader "1.3.6"]
-                 [org.slf4j/slf4j-nop "1.7.12"]
-                 [vvvvalvalval/scope-capture "0.3.2"]]
+                 [org.clojure/tools.reader "1.3.6"]]
   :repl-options {:init-ns app.user}
   :profiles {:dev [:profiles/dev :project/dev]
              :profiles/dev  {}
-             :project/dev {:env {:db-host "localhost"
+             :project/dev {:dependencies [[aprint "0.1.3"]
+                                          [clj-http "3.12.3"]
+                                          [org.clojure/tools.namespace "1.2.0"]
+                                          [org.slf4j/slf4j-nop "1.7.12"]
+                                          [vvvvalvalval/scope-capture "0.3.2"]]
+                           :env {:db-host "localhost"
                                  :db-port 27017
                                  :http-port 8890
                                  :db "mongo-test"
