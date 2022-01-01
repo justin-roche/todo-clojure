@@ -1,6 +1,6 @@
 (ns app.user-tests
   (:require
-   [app.test-utils :as test-utils :refer [post-options get-options system-fixture]]
+   [app.test-utils :as test-utils :refer [post-options get-options system-fixture make-url]]
    [clj-http.client :as client]
    [clojure.data.json :as json]
    [clojure.test :as t :refer [deftest use-fixtures]]
@@ -9,19 +9,19 @@
 
 (defn login-req [data]
   (let [j (json/write-str data)
-        url (str "http://localhost:8890/login")
+        url (make-url "login")
         r (client/post url (post-options j))]
     r))
 
 (defn me-req [name]
   (let [o (merge (get-options) (test-utils/create-auth-header name))
-        r (client/get "http://localhost:8890/me" o)]
+        r (client/get (make-url "me") o)]
     r))
 
 (defn token-req [name token]
   (let [h {:headers {"Authorization" token}}
         o (merge (get-options) h)
-        r (client/get "http://localhost:8890/me" o)]
+        r (client/get (make-url "me") o)]
     r))
 
 (t/deftest me-endpoint

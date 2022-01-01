@@ -61,7 +61,7 @@
               {:get {:handler (fn [rq]
                                 (todos/get-burn-down-report (:user rq)))
                      :interceptors [(auth/verify-token)]}}]
-             ["/todo/"
+             ["/todo"
               {:post {:handler (fn [rq]
                                  (todos/create-todo (:body-params rq)
                                                     (:user rq)))

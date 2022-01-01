@@ -1,10 +1,9 @@
 (ns app.todo-tests
   (:require
    [app.test-data :as test-data]
-   [app.test-utils :as test-utils :refer [post-options get-options system-fixture]]
+   [app.test-utils :as test-utils :refer [post-options get-options system-fixture make-url]]
    [clj-http.client :as client]
    [clojure.test :as t :refer [deftest use-fixtures]]
-
    [clojure.data.json :as json]
    [clojure.tools.reader]
    [app.utils :as utils]))
@@ -12,40 +11,41 @@
 (defn create-todo-req [data name]
   (let [j (json/write-str data)
         a (test-utils/create-auth-header name)
-        url (str "http://localhost:8890/todo/")
+        url (make-url "todo")
         r (client/post url (merge (post-options j) a))]
     r))
 
 (defn get-todos-req [name]
   (let [o (get-options)
         a (test-utils/create-auth-header name)
-        r (client/get "http://localhost:8890/todos" (merge o a))]
+        url (make-url "todos")
+        r (client/get url (merge o a))]
     r))
 
 (defn delete-todo-req [id name]
   (let [a (test-utils/create-auth-header name)
-        url (str "http://localhost:8890/todo/" id)
+        url (make-url ["todo" id])
         r (client/delete url (merge (get-options) a))]
     r))
 
 (defn update-todo-req [id data name]
   (let [j (json/write-str data)
         a (test-utils/create-auth-header name)
-        url (str "http://localhost:8890/todo/" id "/status")
+        url (make-url ["todo" id "status"])
         r (client/post url (merge (post-options j) a))]
     r))
 
 (defn completion-report-req [name]
   (let [j (json/write-str {})
         a (test-utils/create-auth-header name)
-        url "http://localhost:8890/todos/completion-report"
+        url (make-url ["todos" "completion-report"])
         r (client/get url (merge (post-options j) a))]
     r))
 
 (defn burn-down-report-req [name]
   (let [j (json/write-str {})
         a (test-utils/create-auth-header name)
-        url "http://localhost:8890/todos/burn-down-report"
+        url (make-url ["todos" "burn-down-report"])
         r (client/get url (merge (post-options j) a))]
     r))
 

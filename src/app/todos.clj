@@ -6,6 +6,13 @@
    [cheshire.core :refer :all]
    [monger.result :refer :all]))
 
+(defn _get-todo [username todo-id]
+  (first (:todos (find-subdocument
+                  "users"
+                  {"todos" {"$elemMatch"
+                            {"id" todo-id}}}
+                  {"name" 1 "todos.$" 1}))))
+
 (defn create-todo [todo user]
   (let [name (get-in user [:name])
         todo (merge {:status "incomplete"
@@ -16,13 +23,6 @@
                             "todos" todo)
       {:status 200}
       {:status 409})))
-
-(defn _get-todo [username todo-id]
-  (first (:todos (find-subdocument
-                  "users"
-                  {"todos" {"$elemMatch"
-                            {"id" todo-id}}}
-                  {"name" 1 "todos.$" 1}))))
 
 (defn change-todo-status [todo-id data user]
   (let [name (get-in user [:name])

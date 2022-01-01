@@ -5,13 +5,19 @@
    [app.test-data :as test-data]
    [app.users :as users]
    [clojure.tools.reader]
-   [mount.core :as mount :refer [start stop]]))
+   [mount.core :as mount :refer [start stop]]
+   [app.utils :as utils]))
 
-(def base "http://localhost:8890/")
+(def base "http://localhost:8890")
 
 (defn create-auth-header [name]
   (let [token (auth/create-token {:name name})]
     {:headers {"Authorization" token}}))
+
+(defn make-url [fragment]
+  (if (vector? fragment)
+    (str base "/" (apply str (interpose "/" fragment)))
+    (str base "/" fragment)))
 
 (defn get-options
   ([]
