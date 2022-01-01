@@ -37,10 +37,13 @@
 
 (defn insert-subdocument "Insert a subdocument, providing a string uuid"
   [collection query subdocument-key document]
-  (mc/update (:db conn)
-             collection
-             query
-             {:$push  {(keyword subdocument-key)  (merge document {:id (mu/random-uuid)})}}))
+  (let [id (mu/random-uuid)]
+    (if (mc/update (:db conn)
+                   collection
+                   query
+                   {:$push  {(keyword subdocument-key)  (merge document {:id id})}})
+      id
+      nil)))
 
 (defn aggregate-subdocuments [collection pipeline]
   (mc/aggregate (:db conn)

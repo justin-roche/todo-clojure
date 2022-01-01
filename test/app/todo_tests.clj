@@ -70,8 +70,9 @@
 
 (deftest create-todo-requests
   (t/testing "creates todos for a user"
-    (let [todos (create-todo-req {:name "swim"} "a@gmail.com")]
-      (t/is (= 200 (:status todos))))
+    (let [created (create-todo-req {:name "swim"} "a@gmail.com")]
+      (t/is (= 200 (:status created)))
+      (t/is (= "swim" (:name (:data (:body created))))))
     (let [todos (get-todos-req "a@gmail.com")]
       (t/is (= 200 (:status todos)))
       (t/is (= 1 (count (:data (:body todos))))))))
@@ -90,6 +91,7 @@
           a (create-todo-req {:name "swim"} "a@gmail.com")
           a2 (create-todo-req {:name "run"} "a@gmail.com")]
       (t/is (= 200 (:status b)))
+      (t/is (= "swim" (:name (:data (:body b)))))
       (t/is (= 200 (:status a)))
       (t/is (= 200 (:status a2))))
     (let [todos (get-todos-req "a@gmail.com")]
@@ -108,8 +110,8 @@
       (t/is (= 200 (:status todos)))
       (t/is (= 2 (count (:data (:body todos)))))
       (let [id (:id (first (:data (:body todos))))]
-        (let [todos (delete-todo-req id "a@gmail.com")]
-          (t/is (= 200 (:status todos)))))
+        (let [deleted (delete-todo-req id "a@gmail.com")]
+          (t/is (= 200 (:status deleted)))))
       (let [todos (get-todos-req "a@gmail.com")
             t1 (first (:data (:body todos)))]
         (t/is (= 200 (:status todos)))
@@ -134,8 +136,9 @@
       (t/is (= 200 (:status todos)))
       (t/is (= 2 (count (:data (:body todos)))))
       (let [id (:id (first (:data (:body todos))))]
-        (let [todos (update-todo-req id {} "a@gmail.com")]
-          (t/is (= 200 (:status todos)))))
+        (let [updated (update-todo-req id {} "a@gmail.com")]
+          (t/is (= 200 (:status updated)))
+          (t/is (= "complete" (:status (:data (:body updated)))))))
       (let [todos (get-todos-req "a@gmail.com")]
         (t/is (= 200 (:status todos)))
         (t/is (= 2 (count (:data (:body todos)))))

@@ -19,10 +19,11 @@
         todo (merge {:status "incomplete"
                      :visibility "visible"
                      :createdAt (new java.util.Date)} todo)]
-    (if (insert-subdocument "users"
-                            {:name username}
-                            "todos" todo)
-      {:status 200}
+    (if-let [inserted-id (insert-subdocument "users"
+                                             {:name username}
+                                             "todos" todo)]
+      (let [inserted-document (_get-todo username inserted-id)]
+        {:status 200 :body {:data inserted-document}})
       {:status 409})))
 
 (defn change-todo-status [user todo-id]
@@ -31,11 +32,12 @@
         completeNow (= "incomplete" (:status todo))
         newStatus (if completeNow "complete" "incomplete")
         completedAt (if completeNow (new java.util.Date) nil)]
-    (if (update-subdocument "users"
-                            {:name name "todos.id" todo-id}
-                            {"todos.$.status" newStatus
-                             "todos.$.completedAt" completedAt})
-      {:status 200}
+    (if-let [updatedTodo (and (update-subdocument "users"
+                                                  {:name name "todos.id" todo-id}
+                                                  {"todos.$.status" newStatus
+                                                   "todos.$.completedAt" completedAt})
+                              (_get-todo name todo-id))]
+      {:status 200 :body {:data updatedTodo}}
       {:status 409})))
 
 (defn delete-todo [user todo-id]
