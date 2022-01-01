@@ -25,7 +25,7 @@
                               (update-res ctx {:status 500 :body "Invalid schema, wow"})
 
                               [{:interceptor :app.auth/verify-token}]
-                              (update-res ctx {:status 401 :body "Invalid token"})
+                              (do (aprint e)(update-res ctx {:status 401 :body "Invalid token"}))
 
                               [{:interceptor :app.auth/verify-role}]
                               (update-res ctx {:status 401 :body "Incorrect role"})

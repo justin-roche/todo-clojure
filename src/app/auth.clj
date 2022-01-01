@@ -1,27 +1,28 @@
 (ns app.auth
   (:require
+   [app.config :refer [config-map]]
    [app.utils :as utils :refer [log-through]]
    [buddy.hashers :as buddy-hashers]
    [buddy.sign.jwt :as jwt]
-   [app.db :as db]))
-
-(def private-key
-  "Used for signing and verifying JWT-tokens In real world you'd read
-  this from an environment variable or some other configuration that's
-  not included in the source code."
-  "kana15")
+   [clojure.string :as str]
+   [app.db :as db]
+   [taoensso.truss :as truss :refer [have]]
+   [app.config :as config]))
 
 (defn create-token
   "Creates a signed jwt-token with user data as payload. `valid-seconds` sets the expiration span. `name` is selected because the user id will change between test runs."
-  [user & {:keys [valid-seconds] :or {valid-seconds 777200}}] ;; 2 hours
-  (let [payload (-> user
+  [user & {:keys [valid-seconds] :or {valid-seconds 100000}}] ;; 2 hours
+  (let [auth-key (get-in config-map [:auth :auth-key])
+        payload (-> user
                     (select-keys [:name])
                     (assoc :exp (.plusSeconds
                                  (java.time.Instant/now) valid-seconds)))]
-    (jwt/sign payload private-key {:alg :hs512})))
+    (have string? auth-key)
+    (jwt/sign payload auth-key {:alg :hs512})))
 
 (defn unsign-token [token]
-  (try (jwt/unsign token private-key {:alg :hs512})
+  (try (jwt/unsign (str/replace token "Bearer " "")
+                   (get-in config-map [:auth :auth-key]) {:alg :hs512})
        (catch Exception e (throw e))))
 
 (defn verify-token []

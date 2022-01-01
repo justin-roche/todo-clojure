@@ -1,14 +1,16 @@
 (ns app.config
   (:require [mount.core :refer [defstate]]
             [io.pedestal.http :as http]
-            [environ.core :refer [env]]))
+            [environ.core :refer [env]]
+            [app.utils :as utils]))
 
 (def env-mode 'dev')
 
 (defstate config-map
   :start
   (let [c  {:env          env-mode
-            :db {:port   27017
+            :auth {:auth-key (env :auth-key)}
+            :db {:port  27017
                  :host (env :db-host)
                  :db (env :db)
                  :cred-user (env :cred-user)
@@ -18,5 +20,6 @@
                      ::http/port   8890
                      ::http/join?  false
                      ::http/routes  []}}]
+
     c))
 

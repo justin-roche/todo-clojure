@@ -40,7 +40,9 @@
               {:post
                {:handler (fn [rq]
                            (users/login
-                            (:body-params rq)))}}]
+                            (:body-params rq)))
+                :parameters {:body [:map
+                                    [:name string?]]}}}]
              ["/me"
               {:get
                {:handler users/get-me

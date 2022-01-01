@@ -1,0 +1,5 @@
+.clj-kondo/
+profiles.clj
+target/
+.lein-env
+.nrepl-port

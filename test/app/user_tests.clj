@@ -36,7 +36,8 @@
   (t/testing "creates user if user does not exist"
     (let [l (login-req {:name "c@b.com"})
           me (me-req "c@b.com")]
-      (t/is (= 200 (:status me))))))
+      (t/is (= 200 (:status me)))
+      (t/is (= "c@b.com" (:name (:data (:body me))))))))
 
 (deftest new-login-token
   (t/testing "sends valid token for new users"
@@ -45,6 +46,14 @@
           me (token-req "c@b.com" t)]
       (t/is string? (:token (:body l)))
       (t/is (= 200 (:status me))))))
+
+;; (deftest new-login-token
+;;   (t/testing "handles Bearer token format"
+;;     (let [l (login-req {:name "c@b.com"})
+;;           t (:token (:body l))
+;;           me (token-req "c@b.com" t)]
+;;       (t/is string? (:token (:body l)))
+;;       (t/is (= 200 (:status me))))))
 
 (deftest existing-login-token
   (t/testing "sends valid token for existing users"
