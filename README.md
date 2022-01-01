@@ -11,6 +11,13 @@ bash docker-up.sh
 
 ```
 
+Create a profiles.clj file at the root level of the project, and add the following:
+
+```
+{:profiles/dev  {:env {:auth-key ***KEY***}}}
+
+```
+
 Run lein deps.
 "Log in" with any email address (only used for identification; no password)
 
