@@ -1,7 +1,7 @@
 (ns app.users
   (:require
    [app.auth :as auth :refer [create-token]]
-   [app.db :refer [find-document insert insert-multiple]]
+   [app.db :refer [find-document insert-document insert-multiple]]
    [cheshire.core :refer :all]
    [monger.result :refer :all]))
 
@@ -19,7 +19,7 @@
        :body
        {:token (create-token user)
         :message "Authorization success"}}
-      (let [user (insert "users" {:name name})]
+      (let [user (insert-document "users" {:name name})]
         {:status 200
          :body
          {:token (create-token {:name name})

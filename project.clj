@@ -25,6 +25,7 @@
                  [org.clojure/tools.reader "1.3.6"]]
   :repl-options {:init-ns app.user}
   :profiles {:dev [:profiles/dev :project/dev]
+             :test [:profiles/dev :project/dev]
              :profiles/dev  {}
              :project/dev {:dependencies [[aprint "0.1.3"]
                                           [clj-http "3.12.3"]

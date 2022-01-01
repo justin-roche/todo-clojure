@@ -8,7 +8,8 @@
    [monger.credentials :as mgc]
    [monger.result :as mr]
    [monger.util :as mu]
-   [mount.core :refer [defstate]]))
+   [mount.core :refer [defstate]]
+   [app.utils :as utils]))
 
 (defn db-connect [{:keys [cred-db cred-user cred-password host port db]}]
   (let [cred (mgc/create cred-user cred-db cred-password)
@@ -32,7 +33,7 @@
   (mc/purge-many (:db conn) ["users"])
   {:status 200})
 
-(defn insert [coll item]
+(defn insert-document [coll item]
   (mc/insert-and-return (:db conn) coll item))
 
 (defn insert-subdocument "Insert a subdocument, providing a string uuid"
@@ -60,17 +61,9 @@
 (defn find-subdocument [coll doc-query subdocument-query]
   (mc/find-one-as-map (:db conn) coll doc-query subdocument-query))
 
-(defn find-by-id [coll id]
-  (mc/find-by-id (:db conn) coll  (mu/object-id id)))
-
 (defn find-document [coll q]
   (if-let [r (mc/find-one-as-map  (:db conn) coll q)]
     (convert-bson-id-to-string r)
-    nil))
-
-(defn find-documents [coll q]
-  (if-let [r (mc/find-maps (:db conn) coll q)]
-    (map convert-bson-id-to-string r)
     nil))
 
 (defn insert-multiple [coll items]

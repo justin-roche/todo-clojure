@@ -3,6 +3,12 @@
    [aprint.core :refer [aprint]]
    [mount.core :refer [start stop]]))
 
+(defn update-res [ctx v]
+  (update-in ctx [:response] #(merge % v)))
+
+(defn update-req [ctx v]
+  (update-in ctx [:request] #(merge % v)))
+
 (defn with-mount [test]
   (start)
   (test)
@@ -21,8 +27,3 @@
   ([m v]
    v))
 
-(defn update-res [ctx v]
-  (update-in ctx [:response] #(merge % v)))
-
-(defn update-req [ctx v]
-  (update-in ctx [:request] #(merge % v)))

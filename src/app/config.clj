@@ -1,8 +1,8 @@
 (ns app.config
-  (:require [mount.core :refer [defstate]]
-            [io.pedestal.http :as http]
-            [environ.core :refer [env]]
-            [app.utils :as utils]))
+  (:require
+   [environ.core :refer [env]]
+   [io.pedestal.http :as http]
+   [mount.core :refer [defstate]]))
 
 (defstate config-map
   :start

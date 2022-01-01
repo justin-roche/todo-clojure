@@ -24,6 +24,7 @@
         r (client/get (make-url "me") o)]
     r))
 
+
 (t/deftest me-endpoint
   (t/testing "/me endpoint returns user data (demonstrates that token matches user)"
     (let [r (me-req "a@gmail.com")
@@ -32,19 +33,19 @@
       (t/is (= 200 s))
       (t/is (= "a@gmail.com" (:name u))))))
 
-(deftest login
+(deftest login-creates-user
   (t/testing "creates user if user does not exist"
     (let [l (login-req {:name "c@b.com"})
           me (me-req "c@b.com")]
       (t/is (= 200 (:status me)))
       (t/is (= "c@b.com" (:name (:data (:body me))))))))
 
-(deftest login
+(deftest login-body-validation
   (t/testing "validates that username is present"
     (let [l (login-req {})]
       (t/is (= 400 (:status l))))))
 
-(deftest login
+(deftest login-email-validation
   (t/testing "validates that username is email address"
     (let [l (login-req {:name "john"})]
       (t/is (= 400 (:status l))))))
