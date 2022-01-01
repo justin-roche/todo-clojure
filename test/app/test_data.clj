@@ -3,9 +3,10 @@
    [buddy.hashers :as buddy-hashers]
    [clojure.tools.reader]))
 
-(def test-users [{:name "B" :password (buddy-hashers/encrypt "koira12")}
+(def test-usernames ["a@gmail.com" "b@yahoo.com"])
+(def test-users [{:name (first test-usernames) :password (buddy-hashers/encrypt "koira12")}
 
-                 {:name "A" :password (buddy-hashers/encrypt "kissa13")}])
+                 {:name (second test-usernames) :password (buddy-hashers/encrypt "kissa13")}])
 
 
 

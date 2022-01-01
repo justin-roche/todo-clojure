@@ -1,8 +1,7 @@
 (defproject server "0.1.0-SNAPSHOT"
   :description "todo app"
   :url ""
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :license {:name "MIT License"}
   :main app.core/main
   :plugins [[lein-environ "1.2.0"]]
   :dependencies [[buddy "2.0.0"]

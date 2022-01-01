@@ -79,8 +79,3 @@
 (defn insert-multiple [coll items]
   (mr/acknowledged? (mc/insert-batch (:db conn) coll items)))
 
-(comment (utils/with-mount (fn []
-                             (do (insert-subdocument "users" {:name "A"} "todos" {:name "write" :status "incomplete"})
-                                 (update-subdocument "users" {:name "A" "todos.name" "read"} {"todos.$.visibility" "deleted"})
-
-                                 (find-document "users" {:name "A"})))))

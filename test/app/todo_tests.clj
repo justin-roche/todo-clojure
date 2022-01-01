@@ -51,58 +51,58 @@
 
 (deftest get-todo-requests
   (t/testing "get todos returns an empty array if there are no todos"
-    (let [todos (get-todos-req "A")]
+    (let [todos (get-todos-req "a@gmail.com")]
       (t/is (= 200 (:status todos)))
       (t/is (= 0 (count (:data (:body todos))))))))
 
 (deftest deleted-todo-requests
   (t/testing "get-todo does not show deleted todos"
-    (let [b (create-todo-req {:name "swim"} "B")
-          a (create-todo-req {:name "swim" :visibility "deleted"} "A")
-          a2 (create-todo-req {:name "run"} "A")]
+    (let [b (create-todo-req {:name "swim"} "b@yahoo.com")
+          a (create-todo-req {:name "swim" :visibility "deleted"} "a@gmail.com")
+          a2 (create-todo-req {:name "run"} "a@gmail.com")]
       (t/is (= 200 (:status b)))
       (t/is (= 200 (:status a)))
       (t/is (= 200 (:status a2))))
-    (let [todos (get-todos-req "A")]
+    (let [todos (get-todos-req "a@gmail.com")]
       (t/is (= 200 (:status todos)))
       (t/is (= 1 (count (:data (:body todos)))))
       (t/is (= "run" (:name (first (:data (:body todos)))))))))
 
 (deftest create-todo-requests
   (t/testing "creates todos for a user"
-    (let [todos (create-todo-req {:name "swim"} "A")]
+    (let [todos (create-todo-req {:name "swim"} "a@gmail.com")]
       (t/is (= 200 (:status todos))))
-    (let [todos (get-todos-req "A")]
+    (let [todos (get-todos-req "a@gmail.com")]
       (t/is (= 200 (:status todos)))
       (t/is (= 1 (count (:data (:body todos))))))))
 
 (deftest create-todo-requests-for-users
   (t/testing "get todos returns correct todos for different users"
-    (let [b (create-todo-req {:name "swim"} "B")
-          a (create-todo-req {:name "swim"} "A")
-          a2 (create-todo-req {:name "run"} "A")]
+    (let [b (create-todo-req {:name "swim"} "b@yahoo.com")
+          a (create-todo-req {:name "swim"} "a@gmail.com")
+          a2 (create-todo-req {:name "run"} "a@gmail.com")]
       (t/is (= 200 (:status b)))
       (t/is (= 200 (:status a)))
       (t/is (= 200 (:status a2))))
-    (let [todos (get-todos-req "A")]
+    (let [todos (get-todos-req "a@gmail.com")]
       (t/is (= 200 (:status todos)))
       (t/is (= 2 (count (:data (:body todos))))))
-    (let [todos (get-todos-req "B")]
+    (let [todos (get-todos-req "b@yahoo.com")]
       (t/is (= 200 (:status todos)))
       (t/is (= 1 (count (:data (:body todos))))))))
 
 (deftest delete-todo
   (t/testing "deletes todos for a user"
-    (let [t1 (create-todo-req {:name "swim"} "A")
-          t2 (create-todo-req {:name "read"} "A")]
+    (let [t1 (create-todo-req {:name "swim"} "a@gmail.com")
+          t2 (create-todo-req {:name "read"} "a@gmail.com")]
       (t/is (= 200 (:status t1))))
-    (let [todos (get-todos-req "A")]
+    (let [todos (get-todos-req "a@gmail.com")]
       (t/is (= 200 (:status todos)))
       (t/is (= 2 (count (:data (:body todos)))))
       (let [id (:id (first (:data (:body todos))))]
-        (let [todos (delete-todo-req id "A")]
+        (let [todos (delete-todo-req id "a@gmail.com")]
           (t/is (= 200 (:status todos)))))
-      (let [todos (get-todos-req "A")
+      (let [todos (get-todos-req "a@gmail.com")
             t1 (first (:data (:body todos)))]
         (t/is (= 200 (:status todos)))
         (t/is (= 1 (count (:data (:body todos)))))
@@ -110,16 +110,16 @@
 
 (deftest change-todo-status
   (t/testing "changes todo status to complete"
-    (let [t1 (create-todo-req {:name "swim"} "A")
-          t2 (create-todo-req {:name "read"} "A")]
+    (let [t1 (create-todo-req {:name "swim"} "a@gmail.com")
+          t2 (create-todo-req {:name "read"} "a@gmail.com")]
       (t/is (= 200 (:status t1))))
-    (let [todos (get-todos-req "A")]
+    (let [todos (get-todos-req "a@gmail.com")]
       (t/is (= 200 (:status todos)))
       (t/is (= 2 (count (:data (:body todos)))))
       (let [id (:id (first (:data (:body todos))))]
-        (let [todos (update-todo-req id {} "A")]
+        (let [todos (update-todo-req id {} "a@gmail.com")]
           (t/is (= 200 (:status todos)))))
-      (let [todos (get-todos-req "A")]
+      (let [todos (get-todos-req "a@gmail.com")]
         (t/is (= 200 (:status todos)))
         (t/is (= 2 (count (:data (:body todos)))))
         (t/is (= "swim" (:name (first (:data (:body todos))))))
@@ -128,32 +128,32 @@
 
 (deftest change-todo-status
   (t/testing "changes todo status to incomplete"
-    (let [t1 (create-todo-req {:name "swim"} "A")
-          t2 (create-todo-req {:name "read"} "A")]
+    (let [t1 (create-todo-req {:name "swim"} "a@gmail.com")
+          t2 (create-todo-req {:name "read"} "a@gmail.com")]
       (t/is (= 200 (:status t1))))
-    (let [todos (get-todos-req "A")]
+    (let [todos (get-todos-req "a@gmail.com")]
       (let [id (:id (first (:data (:body todos))))]
-        (let [todos (update-todo-req id {} "A")]
+        (let [todos (update-todo-req id {} "a@gmail.com")]
           (t/is (= 200 (:status todos)))))
-      (let [todos (get-todos-req "A")]
+      (let [todos (get-todos-req "a@gmail.com")]
         (t/is (= 200 (:status todos)))
         (t/is (= "complete" (:status (first (:data (:body todos))))))
         (let [id (:id (first (:data (:body todos))))]
-          (let [todos (update-todo-req id {} "A")]
+          (let [todos (update-todo-req id {} "a@gmail.com")]
             (t/is (= 200 (:status todos))))))
-      (let [todos (get-todos-req "A")]
+      (let [todos (get-todos-req "a@gmail.com")]
         (t/is (= 200 (:status todos)))
         (t/is (= nil (:completedAt (first (:data (:body todos))))))
         (t/is (= "incomplete" (:status (first (:data (:body todos))))))))))
 
 (deftest completion-report-request
   (t/testing "creates completion report for a user"
-    (let [t1 (create-todo-req {:name "run"} "A")
-          t2 (create-todo-req {:name "swim"} "A")
-          t3 (create-todo-req {:name "cook"} "A")
-          t4 (create-todo-req {:name "read" :status "complete"} "A")
-          t5 (create-todo-req {:name "write" :status "complete"} "A")])
-    (let [todos (completion-report-req "A")]
+    (let [t1 (create-todo-req {:name "run"} "a@gmail.com")
+          t2 (create-todo-req {:name "swim"} "a@gmail.com")
+          t3 (create-todo-req {:name "cook"} "a@gmail.com")
+          t4 (create-todo-req {:name "read" :status "complete"} "a@gmail.com")
+          t5 (create-todo-req {:name "write" :status "complete"} "a@gmail.com")])
+    (let [todos (completion-report-req "a@gmail.com")]
       (t/is (= 200 (:status todos)))
       (t/is (map? (:data (:body todos))))
       (t/is (vector? (:complete (:data (:body todos)))))
@@ -164,17 +164,17 @@
 
 (deftest burn-down-report-request
   (t/testing "creates burn down report for a user"
-    (let [t1 (create-todo-req {:name "run"} "A")
-          t2 (create-todo-req {:name "swim"} "A")
-          t3 (create-todo-req {:name "cook"} "A")
-          t4 (create-todo-req {:name "read"} "A")
-          t5 (create-todo-req {:name "write"} "A")])
-    (let [todos (get-todos-req "A")]
+    (let [t1 (create-todo-req {:name "run"} "a@gmail.com")
+          t2 (create-todo-req {:name "swim"} "a@gmail.com")
+          t3 (create-todo-req {:name "cook"} "a@gmail.com")
+          t4 (create-todo-req {:name "read"} "a@gmail.com")
+          t5 (create-todo-req {:name "write"} "a@gmail.com")])
+    (let [todos (get-todos-req "a@gmail.com")]
       (t/is (= 200 (:status todos)))
       (let [id (:id (first (:data (:body todos))))]
-        (let [todos (update-todo-req id {} "A")]
+        (let [todos (update-todo-req id {} "a@gmail.com")]
           (t/is (= 200 (:status todos))))
-        (let [report-res (burn-down-report-req "A")
+        (let [report-res (burn-down-report-req "a@gmail.com")
               report (:data (:body report-res))]
           (t/is (= 200 (:status report-res)))
           (t/is (= 6 (count report)))
@@ -182,20 +182,20 @@
 
 (deftest burn-down-report-request-deletions
   (t/testing "burn down report includes deletions"
-    (let [t1 (create-todo-req {:name "run"} "A")
-          t2 (create-todo-req {:name "swim"} "A")
-          t3 (create-todo-req {:name "cook"} "A")
-          t4 (create-todo-req {:name "read"} "A")
-          t5 (create-todo-req {:name "write"} "A")])
-    (let [todos (get-todos-req "A")]
+    (let [t1 (create-todo-req {:name "run"} "a@gmail.com")
+          t2 (create-todo-req {:name "swim"} "a@gmail.com")
+          t3 (create-todo-req {:name "cook"} "a@gmail.com")
+          t4 (create-todo-req {:name "read"} "a@gmail.com")
+          t5 (create-todo-req {:name "write"} "a@gmail.com")])
+    (let [todos (get-todos-req "a@gmail.com")]
       (t/is (= 200 (:status todos)))
       (let [id1 (:id (first (:data (:body todos))))
             id2 (:id (second (:data (:body todos))))]
-        (let [todos (update-todo-req id1 {} "A")]
+        (let [todos (update-todo-req id1 {} "a@gmail.com")]
           (t/is (= 200 (:status todos))))
-        (let [todos (delete-todo-req id2 "A")]
+        (let [todos (delete-todo-req id2 "a@gmail.com")]
           (t/is (= 200 (:status todos))))
-        (let [report-res (burn-down-report-req "A")
+        (let [report-res (burn-down-report-req "a@gmail.com")
               report (:data (:body report-res))]
           (t/is (= 200 (:status report-res)))
           (t/is (= 7 (count report)))

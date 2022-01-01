@@ -6,6 +6,8 @@
    [monger.result :refer :all]
    [app.auth :as auth :refer [create-token]]))
 
+(def email-regexp #".+\@.+\..+")
+
 (defn verify-login [name]
   (if-let [user (find-document "users" {:name name})]
     user

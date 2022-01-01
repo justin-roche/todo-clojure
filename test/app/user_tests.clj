@@ -26,11 +26,11 @@
 
 (t/deftest me-endpoint
   (t/testing "/me endpoint returns user data (demonstrates that token matches user)"
-    (let [r (me-req "A")
+    (let [r (me-req "a@gmail.com")
           s (:status r)
           u (:data (:body r))]
       (t/is (= 200 s))
-      (t/is (= "A" (:name u))))))
+      (t/is (= "a@gmail.com" (:name u))))))
 
 (deftest login
   (t/testing "creates user if user does not exist"
@@ -38,6 +38,11 @@
           me (me-req "c@b.com")]
       (t/is (= 200 (:status me)))
       (t/is (= "c@b.com" (:name (:data (:body me))))))))
+
+(deftest login
+  (t/testing "validates that username is email address"
+    (let [l (login-req {:name "john"})]
+      (t/is (= 400 (:status l))))))
 
 (deftest new-login-token
   (t/testing "sends valid token for new users"
@@ -47,19 +52,12 @@
       (t/is string? (:token (:body l)))
       (t/is (= 200 (:status me))))))
 
-;; (deftest new-login-token
-;;   (t/testing "handles Bearer token format"
-;;     (let [l (login-req {:name "c@b.com"})
-;;           t (:token (:body l))
-;;           me (token-req "c@b.com" t)]
-;;       (t/is string? (:token (:body l)))
-;;       (t/is (= 200 (:status me))))))
-
 (deftest existing-login-token
   (t/testing "sends valid token for existing users"
-    (let [l (login-req {:name "A"})
-          t (:token (:body l))
-          me (token-req "A" t)]
-      (t/is (= 200 (:status me))))))
+    (let [res (login-req {:name "a@gmail.com"})
+          token (:token (:body res))
+          me-res (token-req "a@gmail.com" token)]
+      (t/is string? token)
+      (t/is (= 200 (:status me-res))))))
 
 (use-fixtures :each system-fixture)

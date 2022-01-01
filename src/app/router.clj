@@ -5,7 +5,7 @@
    [app.auth :as auth]
    [app.db :as db]
    [app.errors :as errors]
-   [app.users :as users]
+   [app.users :as users :refer [email-regexp]]
    [io.pedestal.interceptor :as i]
    [reitit.http.coercion :as coercion]
    [reitit.http.interceptors.parameters :as parameters]
@@ -38,7 +38,7 @@
               {:post
                {:handler #(users/login (:body-params %1))
                 :parameters {:body [:map
-                                    [:name string?]]}}}]
+                                    [:name [:re email-regexp]]]}}}]
              ["/me"
               {:get {:handler users/get-me}}]
              ["/todos"

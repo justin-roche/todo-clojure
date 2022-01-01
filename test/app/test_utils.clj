@@ -14,6 +14,10 @@
   (let [token (auth/create-token {:name name})]
     {:headers {"Authorization" token}}))
 
+(defn create-invalid-auth-header []
+  (let [token "bad"]
+    {:headers {"Authorization" token}}))
+
 (defn make-url [fragment]
   (if (vector? fragment)
     (str base "/" (apply str (interpose "/" fragment)))
