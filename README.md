@@ -31,6 +31,8 @@ Create a profiles.clj file at the root level of the project, and add the followi
 
 Run lein deps followed by lein run at the root level of the project.
 
+To run tests connect to the repl, then eval refresher.clj in dev-resources.
+
 ## License
 
 MIT
