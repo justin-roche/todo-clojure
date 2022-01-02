@@ -29,7 +29,7 @@
 (defn insert-document [coll item]
   (mc/insert-and-return (:db conn) coll item))
 
-(defn insert-subdocument "Insert a subdocument, providing a string uuid"
+(defn insert-subdocument "Insert a subdocument, providing a string uuid. `subdocument-key` is the key to an array of subdocuments"
   [collection query subdocument-key document]
   (let [id (mu/random-uuid)]
     (if (mc/update (:db conn) collection query

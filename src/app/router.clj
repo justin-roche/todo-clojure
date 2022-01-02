@@ -8,21 +8,15 @@
    [reitit.coercion.malli]
    [reitit.http.coercion :as coercion]
    [reitit.http.interceptors.exception :as exception]
-   [reitit.http.interceptors.multipart :as multipart]
-   [reitit.http.interceptors.muuntaja :as muuntaja]
-   [reitit.http.interceptors.parameters :as parameters]))
+   [reitit.http.interceptors.muuntaja :as muuntaja]))
 
 (def route-data {:data {:coercion reitit.coercion.malli/coercion
                         :muuntaja m/instance
-                        :interceptors [(muuntaja/format-request-interceptor)
-                                       (parameters/parameters-interceptor)
-                                       (muuntaja/format-negotiate-interceptor)
+                        :interceptors [(muuntaja/format-negotiate-interceptor)
                                        (muuntaja/format-response-interceptor)
                                        (exception/exception-interceptor)
                                        (muuntaja/format-request-interceptor)
-                                       (coercion/coerce-response-interceptor)
-                                       (coercion/coerce-request-interceptor)
-                                       (multipart/multipart-interceptor)]}})
+                                       (coercion/coerce-request-interceptor)]}})
 
 (def routes [""
              {:interceptors [errors/errors-handler (auth/verify-token ["/login"])]}
