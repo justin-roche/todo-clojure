@@ -11,21 +11,22 @@
 
 (defn create-token
   "Creates a signed jwt-token with user data as payload. `valid-seconds` sets the expiration span. `name` is selected because the user id will change between test runs."
-  [user & {:keys [valid-seconds] :or {valid-seconds 100000}}] ;; 2 hours
+  [user]
   (let [auth-key (get-in config-map [:auth :auth-key])
         payload (-> user
                     (select-keys [:name])
                     (assoc :exp (.plusSeconds
-                                 (java.time.Instant/now) valid-seconds)))]
+                                 (java.time.Instant/now) 1000000)))]
     (have string? auth-key)
     (jwt/sign payload auth-key {:alg :hs512})))
 
 (defn unsign-token [token]
-  (try (jwt/unsign (str/replace token "Bearer " "")
-                   (get-in config-map [:auth :auth-key]) {:alg :hs512})
-       (catch Exception e (throw e))))
+  (jwt/unsign (str/replace token "Bearer " "")
+              (get-in config-map [:auth :auth-key]) {:alg :hs512}))
 
-(defn verify-token [exclusions]
+(defn verify-token
+  "Adds user data from token to request. `exclusions` is a list of routes that do not need authenticated."
+  [exclusions]
   {:name ::verify-token
    :enter
    (fn [ctx]

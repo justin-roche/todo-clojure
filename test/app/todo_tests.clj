@@ -6,7 +6,8 @@
    [clojure.test :as t :refer [deftest use-fixtures]]
    [clojure.data.json :as json]
    [clojure.tools.reader]
-   [app.utils :as utils]))
+   [app.utils :as utils]
+   [app.user :as user]))
 
 (defn create-todo-req [data name]
   (let [j (json/write-str data)
@@ -249,6 +250,24 @@
               report (:data (:body report-res))]
           (t/is (= 200 (:status report-res)))
           (t/is (= 7 (count report)))
+          (t/is (= "deletion" (:type (last report)))))))))
+
+(deftest burn-down-report-request-deletions
+  (t/testing "burn down report does not include deleted and completed tasks twice; deletion takes precedence"
+    (let [t1 (create-todo-req {:name "run"} "a@gmail.com")
+          t5 (create-todo-req {:name "write"} "a@gmail.com")])
+    (let [todos (get-todos-req "a@gmail.com")]
+      (t/is (= 200 (:status todos)))
+      (let [id1 (:id (first (:data (:body todos))))
+            id2 (:id (second (:data (:body todos))))]
+        (let [todos (update-todo-req id2 {} "a@gmail.com")]
+          (t/is (= 200 (:status todos))))
+        (let [todos (delete-todo-req id2 "a@gmail.com")]
+          (t/is (= 200 (:status todos))))
+        (let [report-res (burn-down-report-req "a@gmail.com")
+              report (user/log-through "rep" (:data (:body report-res)))]
+          (t/is (= 200 (:status report-res)))
+          (t/is (= 3 (count report)))
           (t/is (= "deletion" (:type (last report)))))))))
 
 (use-fixtures :each system-fixture)

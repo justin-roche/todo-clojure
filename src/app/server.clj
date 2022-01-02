@@ -20,6 +20,6 @@
       (ps/create-server)
       (ps/start)))
 
-(defstate s :start (start-server
-                    (:server config-map))
+(defstate s
+  :start (start-server (:server config-map))
   :stop (http/stop s))

@@ -72,7 +72,8 @@
                   {"$unwind" "$todos"}
                   {"$facet"
                    {:creations [{"$project" {:_id "$todos.id" :type "creation" :eventDate "$todos.createdAt"}}]
-                    :completions [{"$match" {"todos.completedAt" {"$exists" true}}}
+                    :completions [{"$match" {"todos.completedAt" {"$exists" true}
+                                             "todos.deletedAt" {"$exists" false}}}
                                   {"$project" {:_id "$todos.id" :type "completion" :eventDate "$todos.completedAt"}}]
                     :deletions [{"$match" {"todos.deletedAt" {"$exists" true}}}
                                 {"$project" {:_id "$todos.id" :type "deletion" :eventDate "$todos.deletedAt"}}]}}
