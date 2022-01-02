@@ -37,9 +37,6 @@
       id
       nil)))
 
-(defn aggregate-subdocuments [collection pipeline]
-  (mc/aggregate (:db conn) collection pipeline :cursor {}))
-
 (defn update-subdocument [collection query setter]
   (mr/updated-existing? (mc/update (:db conn) collection query {:$set setter})))
 
@@ -50,5 +47,3 @@
   (if-let [r (mc/find-one-as-map  (:db conn) coll q)]
     (convert-bson-id-to-string r)
     nil))
-
-

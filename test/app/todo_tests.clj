@@ -252,7 +252,7 @@
           (t/is (= 7 (count report)))
           (t/is (= "deletion" (:type (last report)))))))))
 
-(deftest burn-down-report-request-deletions
+(deftest burn-down-report-no-duplicates
   (t/testing "burn down report does not include deleted and completed tasks twice; deletion takes precedence"
     (let [t1 (create-todo-req {:name "run"} "a@gmail.com")
           t5 (create-todo-req {:name "write"} "a@gmail.com")])

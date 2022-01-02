@@ -1,8 +1,11 @@
 (ns app.todos
   (:require
-   [app.db :refer [insert-subdocument aggregate-subdocuments update-subdocument find-subdocument]]
+   [app.db :refer [insert-subdocument update-subdocument find-subdocument]]
    [monger.operators :as mo :refer :all]
-   [monger.result :refer :all]))
+   [monger.conversion :as mcv]
+   [aprint.core :refer [aprint]]
+   [monger.result :refer :all]
+   [app.user :as user]))
 
 (defn _get-todo [username todo-id]
   (first (:todos (find-subdocument
@@ -46,40 +49,30 @@
       {:status 200}
       {:status 409})))
 
-(defn get-todos [user]
-  (let [pipeline [{"$match" (select-keys user [:name])}
-                  {"$unwind" "$todos"}
-                  {"$match" {"todos.visibility" {"$not" {"$eq" "deleted"}}}}
-                  {"$group" {:_id "$name" :result {"$push" "$todos"}}}]]
-    (if-let [todos (:result (first (aggregate-subdocuments "users" pipeline)))]
-      {:status 200 :body {:data todos}}
-      {:status 200 :body {:data []}})))
+(defn _filter-visible-todos [todos]
+  (filter #(not (= (:visibility %) "deleted")) todos))
 
-(defn get-completion-report [user]
-  (let [pipeline [{"$match" (select-keys user [:name])}
-                  {"$unwind" "$todos"}
-                  {"$match" {"todos.visibility" {"$not" {"$eq" "deleted"}}}}
-                  {"$group" {:_id "$todos.status" :result {"$push" "$todos"}}}
-                  {"$sort" {"_id" 1}}]]
-    (if-let [todos (aggregate-subdocuments "users" pipeline)]
-      {:status 200 :body {:data {:complete (or (:result (first todos)) [])
-                                 :incomplete (or (:result (second todos)) [])}}}
-      {:status 200 :body {:data []}})))
+(defn get-todos [{:keys [todos]}]
+  (if-let [todos (_filter-visible-todos todos)]
+    {:status 200 :body {:data todos}}
+    {:status 200 :body {:data []}}))
 
-(defn get-burn-down-report [user]
-  (let [pipeline [{"$match" (select-keys user [:name])}
-                  {"$unwind" "$todos"}
-                  {"$facet"
-                   {:creations [{"$project" {:_id "$todos.id" :type "creation" :eventDate "$todos.createdAt"}}]
-                    :completions [{"$match" {"todos.completedAt" {"$exists" true}
-                                             "todos.deletedAt" {"$exists" false}}}
-                                  {"$project" {:_id "$todos.id" :type "completion" :eventDate "$todos.completedAt"}}]
-                    :deletions [{"$match" {"todos.deletedAt" {"$exists" true}}}
-                                {"$project" {:_id "$todos.id" :type "deletion" :eventDate "$todos.deletedAt"}}]}}
-                  {"$project" {:results {"$setUnion" ["$creations" "$completions" "$deletions"]}}}
-                  {"$unwind" "$results"}
-                  {"$replaceRoot" {:newRoot "$results"}}
-                  {"$sort" {"eventDate" 1}}]]
-    (if-let [events (aggregate-subdocuments "users" pipeline)]
-      {:status 200 :body {:data events}}
-      {:status 200 :body {:data []}})))
+(defn get-completion-report [{:keys [todos]}]
+  (let [grouped (group-by #(:status %) (_filter-visible-todos todos))]
+    {:status 200 :body {:data (if (not-empty grouped) grouped
+                                  {:complete []
+                                   :incomplete []})}}))
+
+(defn _reduce-events [acc todo]
+  (let [creation  {:eventDate (:createdAt todo) :id (:id todo) :type "creation"}]
+    (cond
+      (contains? todo :deletedAt)
+      (concat acc [creation {:eventDate (:deletedAt todo) :id (:id todo) :type "deletion"}])
+      (contains? todo :completedAt)
+      (concat acc [creation {:eventDate (:completedAt todo) :id (:id todo) :type "completion"}])
+      :else (concat acc [creation]))))
+
+(defn get-burn-down-report [{:keys [todos]}]
+  (let [events (reduce _reduce-events [] todos)
+        sorted (sort #(compare (:eventDate %1) (:eventDate %2)) events)]
+    {:status 200 :body {:data sorted}}))
