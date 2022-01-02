@@ -21,7 +21,8 @@
     (have string? auth-key)
     (jwt/sign payload auth-key {:alg :hs512})))
 
-(defn unsign-token [token]
+(defn unsign-token "Returns user data saved in token"
+  [token]
   (jwt/unsign (str/replace token "Bearer " "")
               (get-in config-map [:auth :auth-key]) {:alg :hs512}))
 

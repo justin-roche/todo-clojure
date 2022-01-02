@@ -1,18 +1,12 @@
 (ns app.users
   (:require
    [app.auth :as auth :refer [create-token]]
-   [app.db :refer [find-document insert-document]]
-   [app.user :as user]))
+   [app.db :refer [find-document insert-document]]))
 
 (def email-regexp #".+\@.+\..+")
 
-(defn verify-login [name]
-  (if-let [user (find-document "users" {:name name})]
-    user
-    nil))
-
 (defn login [{:keys [name]}]
-  (if-let [user (or (verify-login name)
+  (if-let [user (or (find-document "users" {:name name})
                     (insert-document "users" {:name name}))]
     {:status 200
      :body

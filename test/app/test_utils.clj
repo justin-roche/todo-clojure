@@ -51,7 +51,7 @@
 (defn db-reset []
   (stop)
   (start)
-  (mc/purge-many (:db db/conn) ["users"])
+  (mc/purge-many (:db db/db-state) ["users"])
   (doall (map #(db/insert-document "users" %1) test-data/test-users))
   (stop))
 

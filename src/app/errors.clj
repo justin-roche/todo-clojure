@@ -9,7 +9,7 @@
   (into {} (pe/error-dispatch [ctx e]
 
                               [{:exception-type :malli.core/invalid-schema}]
-                              (update-res ctx {:status 500 :body "Invalid schema"})
+                              (update-res ctx {:status 500 :body "Invalid request"})
 
                               [{:interceptor :app.auth/verify-token}]
                               (do (println "error verifying token")

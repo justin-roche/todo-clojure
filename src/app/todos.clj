@@ -10,32 +10,31 @@
 (defn _get-todo [username todo-id]
   (first (:todos (find-subdocument
                   "users"
-                  {"name" username
-                   "todos" {"$elemMatch"
-                            {"id" todo-id}}}
+                  {"name" username "todos" {"$elemMatch" {"id" todo-id}}}
                   {"name" 1 "todos.$" 1}))))
 
 (defn create-todo [user todo]
   (let [username (get-in user [:name])
-        todo (merge {:status "incomplete"
-                     :visibility "visible"
-                     :createdAt (new java.util.Date)} todo)]
+        default-todo {:status "incomplete"
+                      :visibility "visible"
+                      :createdAt (new java.util.Date)}
+        todo (merge default-todo todo)]
     (if-let [inserted-id (insert-subdocument "users"
                                              {:name username}
                                              "todos" todo)]
       {:status 200 :body {:data (_get-todo username inserted-id)}}
       {:status 409})))
 
-(defn change-todo-status [user todo-id]
-  (let [name (get-in user [:name])
-        todo (_get-todo name todo-id)
-        completeNow (= "incomplete" (:status todo))
-        newStatus (if completeNow "complete" "incomplete")
-        completedAt (if completeNow (new java.util.Date) nil)]
+(defn change-todo-status [{:keys [name]} todo-id]
+  (let [todo (_get-todo name todo-id)
+        set-value (if (= (:status todo) "complete")
+                    {"todos.$.status" "incomplete"
+                     "todos.$.completedAt" nil}
+                    {"todos.$.status" "complete"
+                     "todos.$.completedAt" (new java.util.Date)})]
     (if-let [updatedTodo (and (update-subdocument "users"
                                                   {:name name "todos.id" todo-id}
-                                                  {"todos.$.status" newStatus
-                                                   "todos.$.completedAt" completedAt})
+                                                  set-value)
                               (_get-todo name todo-id))]
       {:status 200 :body {:data updatedTodo}}
       {:status 409})))

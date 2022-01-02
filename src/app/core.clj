@@ -6,7 +6,7 @@
    [app.users :as users]
    [app.server :as server]
    [clojure.tools.reader]
-   [mount.core :as mount :refer [start stop]]))
+   [mount.core :as mount :refer [start]]))
 
 (defn main []
   (start))
