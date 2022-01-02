@@ -2,8 +2,7 @@
   (:require
    [app.auth :as auth :refer [create-token]]
    [app.db :refer [find-document insert-document]]
-   [cheshire.core :refer :all]
-   [monger.result :refer :all]))
+   [app.user :as user]))
 
 (def email-regexp #".+\@.+\..+")
 
@@ -12,18 +11,13 @@
     user
     nil))
 
-(defn login [data]
-  (let [name (get-in data [:name])]
-    (if-let [user (verify-login name)]
-      {:status 200
-       :body
-       {:token (create-token user)
-        :message "Authorization success"}}
-      (let [user (insert-document "users" {:name name})]
-        {:status 200
-         :body
-         {:token (create-token {:name name})
-          :message "User created"}}))))
+(defn login [{:keys [name]}]
+  (if-let [user (or (verify-login name)
+                    (insert-document "users" {:name name}))]
+    {:status 200
+     :body
+     {:token (create-token {:name name})
+      :message "Login success"}}))
 
 (defn get-me [req]
   (if-let [user (find-document "users"

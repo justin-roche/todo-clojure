@@ -3,7 +3,6 @@
    [app.db :refer [insert-subdocument aggregate-subdocuments update-subdocument find-subdocument]]
    [app.utils :as utils]
    [monger.operators :as mo :refer :all]
-   [cheshire.core :refer :all]
    [monger.result :refer :all]))
 
 (defn _get-todo [username todo-id]
@@ -22,8 +21,7 @@
     (if-let [inserted-id (insert-subdocument "users"
                                              {:name username}
                                              "todos" todo)]
-      (let [inserted-document (_get-todo username inserted-id)]
-        {:status 200 :body {:data inserted-document}})
+      {:status 200 :body {:data (_get-todo username inserted-id)}}
       {:status 409})))
 
 (defn change-todo-status [user todo-id]
