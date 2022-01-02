@@ -1,7 +1,6 @@
 (ns app.todos
   (:require
    [app.db :refer [insert-subdocument aggregate-subdocuments update-subdocument find-subdocument]]
-   [app.utils :as utils]
    [monger.operators :as mo :refer :all]
    [monger.result :refer :all]))
 
@@ -77,9 +76,9 @@
                                   {"$project" {:_id "$todos.id" :type "completion" :eventDate "$todos.completedAt"}}]
                     :deletions [{"$match" {"todos.deletedAt" {"$exists" true}}}
                                 {"$project" {:_id "$todos.id" :type "deletion" :eventDate "$todos.deletedAt"}}]}}
-                  {"$project" {:activity {"$setUnion" ["$creations" "$completions" "$deletions"]}}}
-                  {"$unwind" "$activity"}
-                  {"$replaceRoot" {:newRoot "$activity"}}
+                  {"$project" {:results {"$setUnion" ["$creations" "$completions" "$deletions"]}}}
+                  {"$unwind" "$results"}
+                  {"$replaceRoot" {:newRoot "$results"}}
                   {"$sort" {"eventDate" 1}}]]
     (if-let [events (aggregate-subdocuments "users" pipeline)]
       {:status 200 :body {:data events}}

@@ -12,7 +12,8 @@
                               (update-res ctx {:status 500 :body "Invalid schema"})
 
                               [{:interceptor :app.auth/verify-token}]
-                              (do (aprint e) (update-res ctx {:status 401 :body "Invalid token"}))
+                              (do (println "error verifying token")
+                                  (update-res ctx {:status 401 :body "Invalid token"}))
 
                               [{:exception-type :clojure.lang.ExceptionInfo}]
                               (update-res ctx {:status 500 :body "error"})

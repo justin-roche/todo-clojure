@@ -7,7 +7,8 @@
    [clojure.string :as str]
    [app.db :as db]
    [taoensso.truss :as truss :refer [have]]
-   [app.config :as config]))
+   [app.config :as config]
+   [app.user :as user]))
 
 (defn create-token
   "Creates a signed jwt-token with user data as payload. `valid-seconds` sets the expiration span. `name` is selected because the user id will change between test runs."
@@ -34,5 +35,7 @@
        ctx
        (let [token (have string?
                          (get-in ctx [:request :headers "authorization"]))
-             user-data (unsign-token token)]
-         (utils/update-req ctx {:user user-data}))))})
+             token-user (unsign-token token)
+             db-user (db/find-document "users" {:name (:name token-user)})]
+         (if db-user (utils/update-req ctx {:user db-user})
+             (throw (new Error))))))})

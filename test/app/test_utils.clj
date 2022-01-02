@@ -3,11 +3,9 @@
    [app.auth :as auth]
    [app.db :as db]
    [app.test-data :as test-data]
-   [monger.collection :as mc]
-   [app.users :as users]
    [clojure.tools.reader]
-   [mount.core :as mount :refer [start stop]]
-   [app.utils :as utils]))
+   [monger.collection :as mc]
+   [mount.core :as mount :refer [start stop]]))
 
 (def base "http://localhost:8890")
 
@@ -67,5 +65,4 @@
     (catch Exception e (do
                          (stop)
                          (println  "exception of type: " (type e))))))
-
 

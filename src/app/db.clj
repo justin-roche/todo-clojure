@@ -8,8 +8,7 @@
    [monger.credentials :as mgc]
    [monger.result :as mr]
    [monger.util :as mu]
-   [mount.core :refer [defstate]]
-   [app.utils :as utils]))
+   [mount.core :refer [defstate]]))
 
 (defn db-connect [{:keys [cred-db cred-user cred-password host port db]}]
   (let [cred (mgc/create cred-user cred-db cred-password)
