@@ -35,7 +35,7 @@
                            :env {:db-host "localhost"
                                  :db-port 27017
                                  :http-port 8890
-                                 :db "mongo-test"
+                                 :db "todos"
                                  :cred-user "root"
                                  :cred-password "rootpassword"
                                  :cred-db "admin"}}})
