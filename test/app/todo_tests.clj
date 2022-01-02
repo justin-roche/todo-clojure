@@ -154,8 +154,8 @@
       (t/is (= 200 (:status t1))))
     (let [todos (get-todos-req "a@gmail.com")]
       (let [id (:id (first (:data (:body todos))))]
-        (let [todos (update-todo-req id {} "a@gmail.com")]
-          (t/is (= 200 (:status todos)))))
+        (let [updated (update-todo-req id {} "a@gmail.com")]
+          (t/is (= 200 (:status updated)))))
       (let [todos (get-todos-req "a@gmail.com")]
         (t/is (= 200 (:status todos)))
         (t/is (= "complete" (:status (first (:data (:body todos))))))
@@ -180,7 +180,7 @@
           (t/is (= 409 (:status todos))))))))
 
 (deftest empty-completion-report-request
-  (t/testing "creates completion report for a user"
+  (t/testing "creates empty completion report for a user"
     (let [todos (completion-report-req "a@gmail.com")]
       (t/is (= 200 (:status todos)))
       (t/is (map? (:data (:body todos))))
@@ -265,7 +265,7 @@
         (let [todos (delete-todo-req id2 "a@gmail.com")]
           (t/is (= 200 (:status todos))))
         (let [report-res (burn-down-report-req "a@gmail.com")
-              report (user/log-through "rep" (:data (:body report-res)))]
+              report (:data (:body report-res))]
           (t/is (= 200 (:status report-res)))
           (t/is (= 3 (count report)))
           (t/is (= "deletion" (:type (last report)))))))))

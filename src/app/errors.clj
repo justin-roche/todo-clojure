@@ -14,12 +14,9 @@
                               [{:interceptor :app.auth/verify-token}]
                               (do (aprint e) (update-res ctx {:status 401 :body "Invalid token"}))
 
-                              [{:interceptor :app.auth/verify-role}]
-                              (update-res ctx {:status 401 :body "Incorrect role"})
-
                               [{:exception-type :clojure.lang.ExceptionInfo}]
                               (update-res ctx {:status 500 :body "error"})
 
                               :else
-                              (aprint "unhandled exception!!!" e))))
+                              (aprint "unhandled exception" e))))
 
