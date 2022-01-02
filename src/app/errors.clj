@@ -9,7 +9,7 @@
   (into {} (pe/error-dispatch [ctx e]
 
                               [{:exception-type :malli.core/invalid-schema}]
-                              (update-res ctx {:status 500 :body "Invalid schema, wow"})
+                              (update-res ctx {:status 500 :body "Invalid schema"})
 
                               [{:interceptor :app.auth/verify-token}]
                               (do (aprint e) (update-res ctx {:status 401 :body "Invalid token"}))
@@ -17,7 +17,6 @@
                               [{:interceptor :app.auth/verify-role}]
                               (update-res ctx {:status 401 :body "Incorrect role"})
 
-                              ;; fallback cases
                               [{:exception-type :clojure.lang.ExceptionInfo}]
                               (update-res ctx {:status 500 :body "error"})
 

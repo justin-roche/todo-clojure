@@ -1,7 +1,7 @@
 (ns app.users
   (:require
    [app.auth :as auth :refer [create-token]]
-   [app.db :refer [find-document insert-document insert-multiple]]
+   [app.db :refer [find-document insert-document]]
    [cheshire.core :refer :all]
    [monger.result :refer :all]))
 
@@ -24,11 +24,6 @@
          :body
          {:token (create-token {:name name})
           :message "User created"}}))))
-
-(defn add-users [users]
-  (if (insert-multiple "users" users)
-    {:status 200}
-    {:status 409}))
 
 (defn get-me [req]
   (if-let [user (find-document "users"

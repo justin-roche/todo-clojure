@@ -3,6 +3,7 @@
    [app.auth :as auth]
    [app.db :as db]
    [app.test-data :as test-data]
+   [monger.collection :as mc]
    [app.users :as users]
    [clojure.tools.reader]
    [mount.core :as mount :refer [start stop]]
@@ -52,21 +53,19 @@
 (defn db-reset []
   (stop)
   (start)
-  (db/reset-db)
-  (users/add-users test-data/test-users)
+  (mc/purge-many (:db db/conn) ["users"])
+  (doall (map #(db/insert-document "users" %1) test-data/test-users))
   (stop))
 
 (defn system-fixture [test]
   (db-reset)
   (try
     (do  (start)
-
          (let [result (test)]
            (stop)
            result))
-    (catch Exception e (do ;;
+    (catch Exception e (do
                          (stop)
-                         (println  "exception of type: " (type e))
-                         (def big-error e)))))
+                         (println  "exception of type: " (type e))))))
 
 

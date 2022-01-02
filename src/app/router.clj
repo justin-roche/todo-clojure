@@ -1,24 +1,16 @@
 (ns app.router
   (:require
-   [io.pedestal.http.route :as route]
-   [app.utils :refer [with-mount log-through]]
    [app.auth :as auth]
-   [app.db :as db]
    [app.errors :as errors]
+   [app.todos :as todos]
    [app.users :as users :refer [email-regexp]]
-   [io.pedestal.interceptor :as i]
-   [reitit.http.coercion :as coercion]
-   [reitit.http.interceptors.parameters :as parameters]
-   [reitit.http.interceptors.exception :as exception]
-   [reitit.http.interceptors.multipart :as multipart]
    [muuntaja.core :as m]
    [reitit.coercion.malli]
+   [reitit.http.coercion :as coercion]
+   [reitit.http.interceptors.exception :as exception]
+   [reitit.http.interceptors.multipart :as multipart]
    [reitit.http.interceptors.muuntaja :as muuntaja]
-   [io.pedestal.http.body-params :as bp]
-   [aprint.core :refer [aprint]]
-   [app.todos :as todos]))
-
-(def body-parser (bp/body-params (bp/default-parser-map)))
+   [reitit.http.interceptors.parameters :as parameters]))
 
 (def route-data {:data {:coercion reitit.coercion.malli/coercion
                         :muuntaja m/instance

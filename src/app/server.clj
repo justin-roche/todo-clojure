@@ -22,4 +22,4 @@
 
 (defstate s :start (start-server
                     (:server config-map))
-  :stop (do  (http/stop s)))
+  :stop (http/stop s))

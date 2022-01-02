@@ -1,7 +1,7 @@
 (ns app.auth
   (:require
    [app.config :refer [config-map]]
-   [app.utils :as utils :refer [log-through]]
+   [app.utils :as utils]
    [buddy.hashers :as buddy-hashers]
    [buddy.sign.jwt :as jwt]
    [clojure.string :as str]

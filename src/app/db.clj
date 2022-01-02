@@ -17,21 +17,14 @@
         db   (mg/get-db connection db)]
     {:db db :conn connection}))
 
-(defn db-disconnect [connection]
-  mg/disconnect connection)
-
 (defstate conn :start (db-connect (:db config-map))
-  :stop (db-disconnect conn))
+  :stop (mg/disconnect (:conn conn)))
 
 (defn get-id-string [d]
   (str/replace (mcv/from-db-object (get-in d [:_id]) true) "\"" ""))
 
 (defn convert-bson-id-to-string [d]
   (dissoc (assoc d :id (get-id-string d)) :_id))
-
-(defn reset-db []
-  (mc/purge-many (:db conn) ["users"])
-  {:status 200})
 
 (defn insert-document [coll item]
   (mc/insert-and-return (:db conn) coll item))
@@ -66,6 +59,4 @@
     (convert-bson-id-to-string r)
     nil))
 
-(defn insert-multiple [coll items]
-  (mr/acknowledged? (mc/insert-batch (:db conn) coll items)))
 
