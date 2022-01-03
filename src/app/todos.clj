@@ -1,11 +1,8 @@
 (ns app.todos
   (:require
-   [app.db :refer [insert-subdocument update-subdocument find-subdocument]]
+   [app.db :refer [find-subdocument insert-subdocument update-subdocument]]
    [monger.operators :as mo :refer :all]
-   [monger.conversion :as mcv]
-   [aprint.core :refer [aprint]]
-   [monger.result :refer :all]
-   [app.user :as user]))
+   [monger.result :refer :all]))
 
 (defn _get-todo [username todo-id]
   (first (:todos (find-subdocument
@@ -13,16 +10,15 @@
                   {"name" username "todos" {"$elemMatch" {"id" todo-id}}}
                   {"name" 1 "todos.$" 1}))))
 
-(defn create-todo [user todo]
-  (let [username (get-in user [:name])
-        default-todo {:status "incomplete"
+(defn create-todo [{:keys [name]} todo]
+  (let [default-todo {:status "incomplete"
                       :visibility "visible"
                       :createdAt (new java.util.Date)}
         todo (merge default-todo todo)]
     (if-let [inserted-id (insert-subdocument "users"
-                                             {:name username}
+                                             {:name name}
                                              "todos" todo)]
-      {:status 200 :body {:data (_get-todo username inserted-id)}}
+      {:status 200 :body {:data (_get-todo name inserted-id)}}
       {:status 409})))
 
 (defn change-todo-status [{:keys [name]} todo-id]
@@ -39,14 +35,13 @@
       {:status 200 :body {:data updatedTodo}}
       {:status 409})))
 
-(defn delete-todo [user todo-id]
-  (let [name (get-in user [:name])]
-    (if (update-subdocument "users"
-                            {:name name "todos.id" todo-id}
-                            {"todos.$.visibility" "deleted"
-                             "todos.$.deletedAt" (new java.util.Date)})
-      {:status 200}
-      {:status 409})))
+(defn delete-todo [{:keys [name]} todo-id]
+  (if (update-subdocument "users"
+                          {:name name "todos.id" todo-id}
+                          {"todos.$.visibility" "deleted"
+                           "todos.$.deletedAt" (new java.util.Date)})
+    {:status 200}
+    {:status 409}))
 
 (defn _filter-visible-todos [todos]
   (filter #(not (= (:visibility %) "deleted")) todos))
