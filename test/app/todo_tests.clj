@@ -270,7 +270,7 @@
           (t/is (= 3 (count report)))
           (t/is (= "completion" (:type (last report)))))))))
 
-(deftest burn-down-report-no-duplicates
+(deftest burn-down-report-marked-incomplete
   (t/testing "burn down report does not include previous completions later marked incomplete"
     (let [t1 (create-todo-req {:name "run"} "a@gmail.com")
           t5 (create-todo-req {:name "write"} "a@gmail.com")])
