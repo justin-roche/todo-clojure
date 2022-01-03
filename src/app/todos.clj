@@ -60,10 +60,11 @@
 (defn _reduce-events [acc todo]
   (let [creation  {:eventDate (:createdAt todo) :id (:id todo) :type "creation"}]
     (cond
+      (and (contains? todo :completedAt)
+           (not (= nil (:completedAt todo))))
+      (concat acc [creation {:eventDate (:completedAt todo) :id (:id todo) :type "completion"}])
       (contains? todo :deletedAt)
       (concat acc [creation {:eventDate (:deletedAt todo) :id (:id todo) :type "deletion"}])
-      (contains? todo :completedAt)
-      (concat acc [creation {:eventDate (:completedAt todo) :id (:id todo) :type "completion"}])
       :else (concat acc [creation]))))
 
 (defn get-burn-down-report [{:keys [todos]}]

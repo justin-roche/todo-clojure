@@ -253,13 +253,33 @@
           (t/is (= "deletion" (:type (last report)))))))))
 
 (deftest burn-down-report-no-duplicates
-  (t/testing "burn down report does not include deleted and completed tasks twice; deletion takes precedence"
+  (t/testing "burn down report does not include deleted and completed tasks twice; completion takes precedence"
     (let [t1 (create-todo-req {:name "run"} "a@gmail.com")
           t5 (create-todo-req {:name "write"} "a@gmail.com")])
     (let [todos (get-todos-req "a@gmail.com")]
       (t/is (= 200 (:status todos)))
       (let [id1 (:id (first (:data (:body todos))))
             id2 (:id (second (:data (:body todos))))]
+        (let [todos (update-todo-req id2 {} "a@gmail.com")]
+          (t/is (= 200 (:status todos))))
+        (let [todos (delete-todo-req id2 "a@gmail.com")]
+          (t/is (= 200 (:status todos))))
+        (let [report-res (burn-down-report-req "a@gmail.com")
+              report (:data (:body report-res))]
+          (t/is (= 200 (:status report-res)))
+          (t/is (= 3 (count report)))
+          (t/is (= "completion" (:type (last report)))))))))
+
+(deftest burn-down-report-no-duplicates
+  (t/testing "burn down report does not include previous completions later marked incomplete"
+    (let [t1 (create-todo-req {:name "run"} "a@gmail.com")
+          t5 (create-todo-req {:name "write"} "a@gmail.com")])
+    (let [todos (get-todos-req "a@gmail.com")]
+      (t/is (= 200 (:status todos)))
+      (let [id1 (:id (first (:data (:body todos))))
+            id2 (:id (second (:data (:body todos))))]
+        (let [todos (update-todo-req id2 {} "a@gmail.com")]
+          (t/is (= 200 (:status todos))))
         (let [todos (update-todo-req id2 {} "a@gmail.com")]
           (t/is (= 200 (:status todos))))
         (let [todos (delete-todo-req id2 "a@gmail.com")]
